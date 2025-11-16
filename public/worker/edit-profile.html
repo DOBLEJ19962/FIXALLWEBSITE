@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Editar Perfil - Trabajador FIXALL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #6c5ce7;
+    --primary2: #9b59b6;
+    --glass: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.16);
+    --bg1: #0f1020;
+    --bg2: #2f225f;
+    --text: #fff;
+}
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, var(--bg2), var(--bg1) 60%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    color: var(--text);
+    padding-bottom: 100px;
+}
+
+/* TOPBAR */
+.topbar {
+    background: rgba(10,10,30,0.9);
+    padding: 20px;
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+/* CARD */
+.card {
+    width: 92%;
+    max-width: 470px;
+    margin: 25px auto;
+    padding: 25px;
+    border-radius: 20px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+}
+
+/* AVATAR */
+.avatar-wrap {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid var(--border);
+    overflow: hidden;
+    margin: auto;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-btn {
+    margin-top: 14px;
+    background: rgba(255,255,255,0.1);
+    padding: 10px 14px;
+    border-radius: 14px;
+    display: inline-block;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    font-weight: 600;
+}
+
+.warning {
+    text-align: center;
+    color: #ff7373;
+    font-size: 14px;
+    display:none;
+}
+
+/* INPUTS */
+label {
+    display:block;
+    margin-top:14px;
+    font-weight:700;
+}
+
+input, textarea {
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    margin-top:6px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,0.1);
+    color:white;
+    font-size:16px;
+}
+
+textarea {
+    resize:none;
+    min-height:90px;
+}
+
+button {
+    width:100%;
+    padding:16px;
+    margin-top:22px;
+    font-size:18px;
+    font-weight:800;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
+    border:none;
+    border-radius:16px;
+    color:white;
+    cursor:pointer;
+    box-shadow:0 10px 28px rgba(108,92,231,0.45);
+}
+
+/* NAV */
+.bottom-nav {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:rgba(10,10,30,0.95);
+    padding:10px 0;
+    display:flex;
+    justify-content:space-around;
+    border-top:1px solid rgba(255,255,255,0.1);
+}
+.bottom-nav a {
+    color:#aaa;
+    text-decoration:none;
+    text-align:center;
+}
+.bottom-nav a span {
+    font-size:22px;
+    display:block;
+}
+</style>
+
+<script type="module">
+import { supabase } from "/js/supabase.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const u = JSON.parse(localStorage.getItem("fixall_user"));
+    if (!u || u.role !== "worker") {
+        location.href = "/login.html";
+        return;
+    }
+
+    // Campos
+    const nameEl = document.getElementById("name");
+    const phoneEl = document.getElementById("phone");
+    const emailEl = document.getElementById("email");
+    const expEl = document.getElementById("experience");
+    const aboutEl = document.getElementById("about");
+    const avatarImg = document.getElementById("avatarImg");
+    const warnEl = document.getElementById("warn");
+    const fileInput = document.getElementById("fileInput");
+
+    // Cargar datos
+    nameEl.value = u.full_name;
+    phoneEl.value = u.phone;
+    emailEl.value = u.email;
+    expEl.value = u.experience_years || "";
+    aboutEl.value = u.about || "";
+
+    avatarImg.src = u.profile_image ? u.profile_image : "/img/nouser.png";
+    if (!u.profile_image) warnEl.style.display = "block";
+
+    // -------------------------
+    // 🔥 FUNCIÓN SUBIDA FOTO
+    // -------------------------
+    async function uploadProfile(file) {
+        const ext = file.name.split(".").pop();
+        const fileName = `${Date.now()}.${ext}`;
+        const filePath = `${u.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from("profiles")
+            .upload(filePath, file, {
+                contentType: file.type,
+                upsert: true
+            });
+
+        if (uploadError) {
+            alert("Error subiendo imagen: " + uploadError.message);
+            return null;
+        }
+
+        const { data: urlData } = supabase.storage
+            .from("profiles")
+            .getPublicUrl(filePath);
+
+        return urlData.publicUrl;
+    }
+
+    // -------------------------
+    // 🔥 Evento subir foto
+    // -------------------------
+    fileInput.addEventListener("change", async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const url = await uploadProfile(file);
+        if (!url) return;
+
+        avatarImg.src = url;
+        warnEl.style.display = "none";
+        u.profile_image = url;
+    });
+
+    // -------------------------
+    // 🔥 Guardar cambios
+    // -------------------------
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+
+        if (!u.profile_image) {
+            alert("Debes subir una foto de perfil.");
+            return;
+        }
+
+        const updated = {
+            full_name: nameEl.value.trim(),
+            phone: phoneEl.value.trim(),
+            email: emailEl.value.trim(),
+            experience_years: parseInt(expEl.value),
+            about: aboutEl.value.trim(),
+            profile_image: u.profile_image
+        };
+
+        const { data, error } = await supabase
+            .from("users")
+            .update(updated)
+            .eq("id", u.id)
+            .select()
+            .single();
+
+        if (error) {
+            alert("Error guardando: " + error.message);
+            return;
+        }
+
+        localStorage.setItem("fixall_user", JSON.stringify(data));
+
+        alert("Perfil actualizado.");
+        location.href = "/worker/profile.html";
+    });
+
+});
+</script>
+
+</head>
+<body>
+
+<div class="topbar">Editar Perfil</div>
+
+<div class="card">
+
+    <div class="avatar-wrap">
+        <div class="avatar">
+            <img id="avatarImg">
+        </div>
+        <label class="upload-btn">
+            Subir foto
+            <input type="file" id="fileInput" accept="image/*" style="display:none;">
+        </label>
+
+        <div class="warning" id="warn">
+            ⚠ Debes subir una foto de perfil obligatoriamente.
+        </div>
+    </div>
+
+    <label>Nombre completo</label>
+    <input id="name" type="text">
+
+    <label>Correo electrónico</label>
+    <input id="email" type="email">
+
+    <label>Teléfono</label>
+    <input id="phone" type="tel">
+
+    <label>Años de experiencia</label>
+    <input id="experience" type="number" min="0">
+
+    <label>Sobre ti</label>
+    <textarea id="about" placeholder="Cuéntale a los clientes sobre tu experiencia, áreas donde trabajas, etc."></textarea>
+
+    <button id="saveBtn">Guardar Cambios</button>
+</div>
+
+<div class="bottom-nav">
+    <a href="/worker/dashboard.html"><span>📋</span>Trabajos</a>
+    <a href="/worker/profile.html"><span>👤</span>Perfil</a>
+</div>
+
+</body>
+</html>

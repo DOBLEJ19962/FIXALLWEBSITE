@@ -243,14 +243,21 @@ body {
 import { supabase } from "/js/supabase.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
+
     const w = JSON.parse(localStorage.getItem("fixall_user"));
     if (!w || w.role !== "worker") {
         location.href = "/login.html";
         return;
     }
 
-    // Mostrar algo de info en chip
-    document.getElementById("workerNameChip").textContent = w.full_name || "Trabajador FIXALL";
+    // Bloquear si no tiene foto
+    if (!w.profile_image) {
+        alert("Debes subir una foto de perfil antes de aceptar trabajos.");
+        location.href = "/worker/edit-profile.html";
+        return;
+    }
+
+    document.getElementById("workerNameChip").textContent = w.full_name;
 
     const availableList = document.getElementById("availableJobs");
     const myJobsList = document.getElementById("myJobs");
@@ -283,14 +290,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         availableList.innerHTML = "";
 
-        if (error) {
-            console.error(error);
-            availableList.innerHTML = `<div class="empty-message">Error cargando trabajos disponibles.</div>`;
-            return;
-        }
-
         if (!jobs || jobs.length === 0) {
-            availableList.innerHTML = `<div class="empty-message">No hay trabajos disponibles por ahora. Revisa en unos minutos.</div>`;
+            availableList.innerHTML = `<div class="empty-message">No hay trabajos disponibles.</div>`;
             return;
         }
 
@@ -298,7 +299,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const div = document.createElement("div");
             div.className = "job-card";
 
-            const price = job.price && job.price.toFixed ? job.price.toFixed(2) : (job.price || "0.00");
+            const price = job.price?.toFixed ? job.price.toFixed(2) : "0.00";
 
             div.innerHTML = `
                 <div class="job-header">
@@ -309,10 +310,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="job-price">$${price}</div>
                 </div>
                 <div class="job-body">
-                    <div class="job-row"><b>Categoría:</b> ${job.category || "Servicio"}</div>
+                    <div class="job-row"><b>Categoría:</b> ${job.category}</div>
                     <div class="job-row"><b>Dirección:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
-                    <div class="job-row"><b>Pago:</b> ${job.payment_methods || "No especificado"}</div>
-                    <div class="job-row"><b>Detalles:</b> ${job.description || ""}</div>
+                    <div class="job-row"><b>Pago:</b> ${job.payment_methods}</div>
+                    <div class="job-row"><b>Detalles:</b> ${job.description}</div>
                     ${statusPill(job.status)}
                 </div>
                 <div class="job-footer">
@@ -321,6 +322,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
             `;
 
+            // BOTÓN ACEPTAR (YA ARREGLADO)
             div.querySelector(".action-btn-main").addEventListener("click", async () => {
                 const { error: errUpdate } = await supabase
                     .from("jobs")
@@ -328,6 +330,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         worker_id: w.id,
                         worker_name: w.full_name,
                         worker_phone: w.phone,
+                        worker_photo: w.profile_image,   // ← ESTE FALTABA
                         status: "accepted"
                     })
                     .eq("id", job.id)
@@ -335,7 +338,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (errUpdate) {
                     console.error(errUpdate);
-                    alert("Otro trabajador ya aceptó este trabajo.");
+                    alert("No se pudo aceptar. Intenta de nuevo.");
                     return;
                 }
 
@@ -343,32 +346,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                 await loadAll();
             });
 
-            div.querySelector(".action-btn-secondary").addEventListener("click", () => {
-                window.open(mapsLink(job), "_blank");
-            });
+            div.querySelector(".action-btn-secondary")
+               .addEventListener("click", () => window.open(mapsLink(job), "_blank"));
 
             availableList.appendChild(div);
         });
     }
 
     async function updateStatus(jobId, newStatus) {
-        const { error } = await supabase
+        await supabase
             .from("jobs")
             .update({ status: newStatus })
             .eq("id", jobId)
             .eq("worker_id", w.id);
 
-        if (error) {
-            console.error(error);
-            alert("Error actualizando estado: " + error.message);
-            return;
-        }
-
         await loadAll();
     }
 
     async function loadMyJobs() {
-        const { data: jobs, error } = await supabase
+        const { data: jobs } = await supabase
             .from("jobs")
             .select("*")
             .eq("worker_id", w.id)
@@ -376,14 +372,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         myJobsList.innerHTML = "";
 
-        if (error) {
-            console.error(error);
-            myJobsList.innerHTML = `<div class="empty-message">Error cargando tus trabajos.</div>`;
-            return;
-        }
-
         if (!jobs || jobs.length === 0) {
-            myJobsList.innerHTML = `<div class="empty-message">Todavía no tienes trabajos asignados.</div>`;
+            myJobsList.innerHTML = `<div class="empty-message">No tienes trabajos aún.</div>`;
             return;
         }
 
@@ -391,7 +381,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const div = document.createElement("div");
             div.className = "job-card";
 
-            const price = job.price && job.price.toFixed ? job.price.toFixed(2) : (job.price || "0.00");
+            const price = job.price?.toFixed ? job.price.toFixed(2) : "0.00";
 
             div.innerHTML = `
                 <div class="job-header">
@@ -402,10 +392,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="job-price">$${price}</div>
                 </div>
                 <div class="job-body">
-                    <div class="job-row"><b>Categoría:</b> ${job.category || "Servicio"}</div>
+                    <div class="job-row"><b>Categoría:</b> ${job.category}</div>
                     <div class="job-row"><b>Dirección:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
-                    <div class="job-row"><b>Pago:</b> ${job.payment_methods || "No especificado"}</div>
-                    <div class="job-row"><b>Detalles:</b> ${job.description || ""}</div>
+                    <div class="job-row"><b>Pago:</b> ${job.payment_methods}</div>
+                    <div class="job-row"><b>Detalles:</b> ${job.description}</div>
                     ${statusPill(job.status)}
                 </div>
                 <div class="job-footer" id="actions-${job.id}">
@@ -413,52 +403,49 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
             `;
 
-            div.querySelector(".action-btn-secondary").addEventListener("click", () => {
-                window.open(mapsLink(job), "_blank");
-            });
+            div.querySelector(".action-btn-secondary")
+                .addEventListener("click", () => window.open(mapsLink(job), "_blank"));
 
-            const actionsDiv = div.querySelector(`#actions-${job.id}`);
+            const actions = div.querySelector(`#actions-${job.id}`);
 
             if (job.status === "accepted") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
                 btn.textContent = "Marcar: En camino";
-                btn.addEventListener("click", async () => {
-                    await updateStatus(job.id, "on_the_way");
-                });
-                actionsDiv.appendChild(btn);
-            } else if (job.status === "on_the_way") {
+                btn.onclick = () => updateStatus(job.id, "on_the_way");
+                actions.appendChild(btn);
+            }
+
+            if (job.status === "on_the_way") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
                 btn.textContent = "Marcar: Trabajando";
-                btn.addEventListener("click", async () => {
-                    await updateStatus(job.id, "working");
-                });
-                actionsDiv.appendChild(btn);
-            } else if (job.status === "working") {
+                btn.onclick = () => updateStatus(job.id, "working");
+                actions.appendChild(btn);
+            }
+
+            if (job.status === "working") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
                 btn.textContent = "Marcar: Completado";
-                btn.addEventListener("click", async () => {
-                    await updateStatus(job.id, "complete");
-                });
-                actionsDiv.appendChild(btn);
-            } else if (job.status === "complete") {
+                btn.onclick = () => updateStatus(job.id, "complete");
+                actions.appendChild(btn);
+            }
+
+            if (job.status === "complete") {
                 const done = document.createElement("div");
                 done.className = "job-row";
-                done.style.marginTop = "6px";
                 done.style.color = "#00d98b";
-                done.style.fontWeight = "700";
-                done.textContent = "✅ Trabajo completado";
-                actionsDiv.appendChild(done);
-            } else if (job.status === "cancelled") {
-                const cancelled = document.createElement("div");
-                cancelled.className = "job-row";
-                cancelled.style.marginTop = "6px";
-                cancelled.style.color = "#ff7675";
-                cancelled.style.fontWeight = "700";
-                cancelled.textContent = "❌ Trabajo cancelado por el cliente";
-                actionsDiv.appendChild(cancelled);
+                done.textContent = "✔ Trabajo completado";
+                actions.appendChild(done);
+            }
+
+            if (job.status === "cancelled") {
+                const can = document.createElement("div");
+                can.className = "job-row";
+                can.style.color = "#ff7675";
+                can.textContent = "✖ Cancelado por el cliente";
+                actions.appendChild(can);
             }
 
             myJobsList.appendChild(div);
@@ -470,7 +457,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         await loadMyJobs();
     }
 
-    // Tabs behavior
     function showAvailable() {
         tabAvailable.classList.add("tab-btn-active");
         tabMyJobs.classList.remove("tab-btn-active");
