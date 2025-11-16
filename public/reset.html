@@ -59,16 +59,18 @@ a { color: #a29bfe; }
 <script type="module">
 import { supabase } from "/js/supabase.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
-    const email = new URLSearchParams(window.location.search).get("email");
+    // 1) Revisar si hay un usuario autenticado por el enlace
+    const { data, error } = await supabase.auth.getUser();
 
-    if (!email) {
-        alert("Error: Falta el correo.");
-        window.location.href = "/login.html";
+    if (error || !data.user) {
+        alert("Acceso denegado. Usa el enlace enviado a tu correo.");
+        window.location.href = "/forgot.html";
         return;
     }
 
+    // 2) Solo si viene bien autenticado, permitimos cambiar la contraseña
     document.getElementById("resetBtn").addEventListener("click", async () => {
         const password = document.getElementById("password").value.trim();
 
@@ -77,13 +79,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const { error } = await supabase
-            .from("users")
-            .update({ password })
-            .eq("email", email);
+        const { error: updateError } = await supabase.auth.updateUser({
+            password
+        });
 
-        if (error) {
-            alert("Error actualizando: " + error.message);
+        if (updateError) {
+            alert("Error actualizando: " + updateError.message);
             return;
         }
 

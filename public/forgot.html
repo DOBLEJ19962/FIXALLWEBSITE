@@ -61,45 +61,4 @@ import { supabase } from "/js/supabase.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    document.getElementById("sendBtn").addEventListener("click", async () => {
-        const email = document.getElementById("email").value.trim();
-
-        if (!email) {
-            alert("Introduce tu correo.");
-            return;
-        }
-
-        // Buscar usuario
-        const { data, error } = await supabase
-            .from("users")
-            .select("email")
-            .eq("email", email)
-            .single();
-
-        if (error || !data) {
-            alert("Este correo no está registrado.");
-            return;
-        }
-
-        // Todo OK → redirigir a reset
-        window.location.href = `/reset.html?email=${encodeURIComponent(email)}`;
-    });
-
-});
-</script>
-
-</head>
-<body>
-
-<div class="box">
-    <h2>Recuperar contraseña</h2>
-    <p>Ingresa tu correo para continuar.</p>
-
-    <input id="email" type="email" placeholder="Correo">
-    <button id="sendBtn">Continuar</button>
-
-    <p><a href="/index.html">Volver</a></p>
-</div>
-
-</body>
-</html>
+    document.ge

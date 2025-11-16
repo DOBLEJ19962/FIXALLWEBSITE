@@ -1,94 +1,98 @@
 // public/js/auth.js
 import { supabase } from "./supabase.js";
 
-console.log("auth.js cargado");
-
-// ======================
-// REGISTER
-// ======================
+// ===================================
+// REGISTRO CON CONFIRMACIÓN DE EMAIL
+// ===================================
 document.getElementById("registerBtn")?.addEventListener("click", async () => {
+
   const full_name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const phone = document.getElementById("phone").value.trim();
-
   const street = document.getElementById("street").value.trim();
   const city = document.getElementById("city").value.trim();
   const state = document.getElementById("state").value.trim();
   const zipcode = document.getElementById("zipcode").value.trim();
-
   const role = document.getElementById("role").value;
 
-  if (!full_name || !email || !password || !phone || !street || !city || !state || !zipcode) {
-    alert("Completa todos los campos.");
-    return;
+  if (!full_name || !email || !password) {
+    return alert("Faltan campos obligatorios.");
   }
 
-  const { data, error } = await supabase
-    .from("users")
-    .insert([{ full_name, email, password, phone, street, city, state, zipcode, role }])
-    .select()
-    .single();
+  // Crear usuario en Auth
+  const { data: auth, error: authError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: window.location.origin + "/login.html"
+    }
+  });
 
-  if (error) {
-    console.error(error);
-    alert("Error registrando: " + error.message);
-    return;
+  if (authError) {
+    console.error(authError);
+    return alert(authError.message);
   }
 
-  localStorage.setItem("fixall_user", JSON.stringify(data));
+  // Guardar datos adicionales en tabla users
+  await supabase.from("users").insert({
+    id: auth.user.id, // ID real de Supabase Auth
+    full_name,
+    email,
+    phone,
+    street,
+    city,
+    state,
+    zipcode,
+    role
+  });
 
-  if (role === "client") location.href = "/client/dashboard.html";
-  else location.href = "/worker/dashboard.html";
+  alert("Cuenta creada. Revisa tu correo y confirma tu email para poder entrar.");
+  location.href = "/login.html";
 });
 
-// ======================
+// =======================
 // LOGIN
-// ======================
+// =======================
 document.getElementById("loginBtn")?.addEventListener("click", async () => {
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
-    alert("Introduce correo y contraseña.");
-    return;
+    return alert("Completa todos los campos.");
   }
 
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("email", email)
-    .eq("password", password)
-    .single();
-
-  if (error || !data) {
-    console.error(error);
-    alert("Correo o contraseña incorrectos.");
-    return;
-  }
-
-  localStorage.setItem("fixall_user", JSON.stringify(data));
-
-  if (data.role === "client") location.href = "/client/dashboard.html";
-  else location.href = "/worker/dashboard.html";
-});
-
-// ======================
-// UPDATE PROFILE (EXPORT)
-// ======================
-export async function updateProfile(updatedData, userId) {
-  const { data, error } = await supabase
-    .from("users")
-    .update(updatedData)
-    .eq("id", userId)
-    .select()
-    .single();
+  // Login real
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
 
   if (error) {
     console.error(error);
-    return { error };
+    return alert(error.message);
   }
 
-  localStorage.setItem("fixall_user", JSON.stringify(data));
-  return { data };
-}
+  // Evitar login si no ha confirmado su email
+  if (!data.user.email_confirmed_at) {
+    return alert("Confirma tu correo antes de iniciar sesión.");
+  }
+
+  // Obtener datos extra del usuario
+  const { data: profile } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", data.user.id)
+    .single();
+
+  // Guardar en localStorage
+  localStorage.setItem("fixall_user", JSON.stringify(profile));
+
+  // Redirigir según rol
+  if (profile.role === "client") {
+    location.href = "/client/dashboard.html";
+  } else {
+    location.href = "/worker/dashboard.html";
+  }
+});
