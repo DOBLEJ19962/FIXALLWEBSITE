@@ -373,6 +373,7 @@ import { supabase } from "/js/supabase.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
 
+
     const w = JSON.parse(localStorage.getItem("fixall_user"));
     if (!w || w.role !== "worker") {
         location.href = "/login.html";
@@ -876,6 +877,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         await loadCompleted();
         await updateOverlayAndFab();
     }
+
+    await loadAll();
+showAvailable();
+
+/* ---------------------------------------
+   REALTIME PARA WORKER
+   Escucha cambios en trabajos en tiempo real
+----------------------------------------*/
+const workerRealtime = supabase
+  .channel("jobs-realtime-worker")
+  .on(
+    "postgres_changes",
+    {
+      event: "*",
+      schema: "public",
+      table: "jobs"
+    },
+    async (payload) => {
+      console.log("WORKER realtime update:", payload);
+
+      // Refresca TODO automáticamente
+      await loadAll();
+    }
+  )
+  .subscribe();
+
 
     await loadAll();
     showAvailable();

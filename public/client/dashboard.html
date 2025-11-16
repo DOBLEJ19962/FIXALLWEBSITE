@@ -207,10 +207,13 @@ import { supabase } from "/js/supabase.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const u = JSON.parse(localStorage.getItem("fixall_user"));
+
     if (!u || u.role !== "client") {
         location.href = "/login.html";
         return;
     }
+
+
 
     // HERO
     document.getElementById("heroName").textContent = u.full_name;
@@ -323,6 +326,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     loadJobs();
+
+    /* ---------------------------------------
+       REALTIME PARA CLIENTE
+       Escucha cambios en tiempo real en 'jobs'
+    ----------------------------------------*/
+    const clientRealtime = supabase
+      .channel("jobs-realtime-client")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "jobs"
+        },
+        async (payload) => {
+          console.log("CLIENTE - cambio realtime:", payload);
+
+          // Recargar solo si el trabajo pertenece a este cliente
+          const newJob = payload.new;
+          const oldJob = payload.old;
+
+          if ((newJob && newJob.client_id === u.id) ||
+              (oldJob && oldJob.client_id === u.id)) {
+            
+            await loadJobs(); // 🔥 REFRESCA EN TIEMPO REAL
+          }
+        }
+      )
+      .subscribe();
+
 });
 </script>
 
