@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>FIXALL - Panel Trabajador</title>
+<title>FIXALL - Worker Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -18,6 +18,7 @@
     --red: #ff7675;
 }
 
+/* GENERAL */
 * { box-sizing: border-box; }
 
 body {
@@ -28,7 +29,7 @@ body {
     padding-bottom: 72px;
 }
 
-/* HEADER / BRAND */
+/* HEADER */
 .header {
     padding: 18px 18px 12px;
     display: flex;
@@ -52,10 +53,7 @@ body {
     font-weight:900;
     box-shadow:0 6px 16px rgba(108,92,231,0.8);
 }
-.brand-txt {
-    display:flex;
-    flex-direction:column;
-}
+.brand-txt { display:flex; flex-direction:column; }
 .brand-txt .t1 {
     font-size:14px;
     font-weight:800;
@@ -73,7 +71,136 @@ body {
     border:1px solid rgba(255,255,255,0.12);
 }
 
-/* TABS NAV */
+/* FULLSCREEN STATUS OVERLAY (OFFLINE) */
+.status-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at top, #2f225f 0%, #050413 50%, #02010a 100%);
+    backdrop-filter: blur(16px);
+    display: none; /* flex when visible */
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+.status-card {
+    width: 90%;
+    max-width: 420px;
+    padding: 28px 22px 24px;
+    border-radius: 22px;
+    background: rgba(10,10,30,0.9);
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.7);
+    text-align: center;
+}
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.18);
+    margin-bottom: 14px;
+}
+.status-dot-big {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+}
+.status-title {
+    font-size: 22px;
+    font-weight: 800;
+}
+.status-subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--text-soft);
+}
+.status-jobs {
+    margin-top: 14px;
+    font-size: 13px;
+    color: #dfe6ff;
+}
+.status-btn {
+    margin-top: 22px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 18px;
+    border: none;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6c5ce7, #9b59b6);
+    color: white;
+    box-shadow: 0 14px 30px rgba(108,92,231,0.7);
+}
+
+/* SMALL DIALOG OVERLAY (GO OFFLINE CONFIRM) */
+.dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 60;
+}
+.dialog-card {
+    width: 88%;
+    max-width: 380px;
+    background: rgba(12,12,30,0.96);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.16);
+    padding: 20px 18px 16px;
+    box-shadow: 0 14px 34px rgba(0,0,0,0.8);
+}
+.dialog-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+.dialog-text {
+    font-size: 14px;
+    color: var(--text-soft);
+    margin-bottom: 14px;
+}
+.dialog-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.dialog-btn-primary {
+    width: 100%;
+    padding: 11px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg,#6c5ce7,#9b59b6);
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+}
+.dialog-btn-danger {
+    width: 100%;
+    padding: 11px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,118,117,0.7);
+    background: rgba(255,118,117,0.08);
+    color:#ff7675;
+    font-weight:700;
+    cursor:pointer;
+}
+.dialog-btn-ghost {
+    width: 100%;
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-soft);
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* TABS */
 .tabs {
     margin: 0 18px 10px;
     background: rgba(10,10,28,0.95);
@@ -98,11 +225,10 @@ body {
     box-shadow: 0 6px 14px rgba(108,92,231,0.7);
 }
 
-/* SECTION TITLE */
+/* TITLES */
 .section-title {
     margin: 6px 18px 4px;
     font-size: 13px;
-    text-transform: uppercase;
     letter-spacing: 0.13em;
     color: rgba(199,201,230,0.85);
 }
@@ -121,34 +247,17 @@ body {
     justify-content: space-between;
     align-items: center;
 }
-.job-title-block {
-    display: flex;
-    flex-direction: column;
-}
-.job-title {
-    font-size: 15px;
-    font-weight: 700;
-}
-.job-client {
-    font-size: 11px;
-    color: var(--text-soft);
-}
-.job-price {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--green);
-}
+.job-title-block { display: flex; flex-direction: column; }
+.job-title { font-size: 15px; font-weight: 700; }
+.job-client { font-size: 11px; color: var(--text-soft); }
+.job-price { font-size: 16px; font-weight: 800; color: var(--green); }
 .job-body {
     margin-top: 8px;
     font-size: 12px;
     color: var(--text-soft);
 }
-.job-row {
-    margin-top: 4px;
-}
-.job-row b {
-    color: #f5f6fa;
-}
+.job-row { margin-top: 4px; }
+.job-row b { color: #f5f6fa; }
 .job-footer {
     margin-top: 10px;
     display: flex;
@@ -177,7 +286,7 @@ body {
     cursor: pointer;
 }
 
-/* STATUS PILL */
+/* STATUS PILLS */
 .status-pill {
     display: inline-flex;
     align-items: center;
@@ -197,6 +306,7 @@ body {
 .s-pending   { background:rgba(99,110,114,0.4); color:#dfe6e9; }
 .s-accepted  { background:rgba(108,92,231,0.4); color:#dfe6ff; }
 .s-on_the_way{ background:rgba(253,203,110,0.4); color:#ffeaa7; }
+.s-arrived   { background:rgba(0,151,230,0.4); color:#aee9ff; }
 .s-working   { background:rgba(232,67,147,0.4); color:#ffb6e3; }
 .s-complete  { background:rgba(0,184,148,0.4); color:#a3ffdf; }
 .s-cancelled { background:rgba(214,48,49,0.4); color:#ffb3b3; }
@@ -209,7 +319,26 @@ body {
     color: var(--text-soft);
 }
 
-/* NAV INFERIOR */
+/* FLOATING GO OFFLINE BUTTON */
+.fab-offline {
+    position: fixed;
+    bottom: 76px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 11px 22px;
+    border-radius: 999px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    background: rgba(255,118,117,0.2);
+    color: #ffecec;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.7);
+    display: none;
+    z-index: 40;
+    cursor: pointer;
+}
+
+/* NAV BAR */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -250,9 +379,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // Bloquear si no tiene foto
     if (!w.profile_image) {
-        alert("Debes subir una foto de perfil antes de aceptar trabajos.");
+        alert("You must upload a profile picture before accepting jobs.");
         location.href = "/worker/edit-profile.html";
         return;
     }
@@ -261,14 +389,102 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const availableList = document.getElementById("availableJobs");
     const myJobsList = document.getElementById("myJobs");
+    const completedList = document.getElementById("completedJobs");
 
     const tabAvailable = document.getElementById("tabAvailable");
     const tabMyJobs = document.getElementById("tabMyJobs");
+    const tabCompleted = document.getElementById("tabCompleted");
 
+    const statusOverlay = document.getElementById("statusOverlay");
+    const overlayStatusText = document.getElementById("overlayStatusText");
+    const overlayJobsText = document.getElementById("overlayJobsText");
+    const btnGoOnline = document.getElementById("btnGoOnline");
+
+    const fabOffline = document.getElementById("fabOffline");
+
+    const dialogOverlay = document.getElementById("dialogOverlay");
+    const dialogTitle = document.getElementById("dialogTitle");
+    const dialogText = document.getElementById("dialogText");
+    const dialogPrimary = document.getElementById("dialogPrimary");
+    const dialogDanger = document.getElementById("dialogDanger");
+    const dialogGhost = document.getElementById("dialogGhost");
+
+    let activeJobCache = null; // para usar en la confirmación de offline
+
+    /* ---------------------------
+       WORKER ONLINE / OFFLINE
+       Table: worker_status
+       Columns: id, worker_id, is_online, last_online
+    ----------------------------*/
+
+    async function getWorkerStatus() {
+        const { data, error } = await supabase
+            .from("worker_status")
+            .select("*")
+            .eq("worker_id", w.id)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Error getWorkerStatus:", error);
+            return null;
+        }
+        return data;
+    }
+
+    async function ensureWorkerStatusRow() {
+        const row = await getWorkerStatus();
+        if (!row) {
+            const { error } = await supabase
+                .from("worker_status")
+                .insert({
+                    worker_id: w.id,
+                    is_online: false,
+                    last_online: new Date().toISOString()
+                });
+            if (error) console.error("Error inserting worker_status:", error);
+        }
+    }
+
+    async function setWorkerOnlineState(isOnline) {
+        const { error } = await supabase
+            .from("worker_status")
+            .update({
+                is_online: isOnline,
+                last_online: new Date().toISOString()
+            })
+            .eq("worker_id", w.id);
+
+        if (error) console.error("Error updating worker_status:", error);
+    }
+
+    /* ---------------------------
+       ACTIVE JOB (accepted/on_the_way/arrived/working)
+    ----------------------------*/
+    async function getActiveJob() {
+        const { data, error } = await supabase
+            .from("jobs")
+            .select("*")
+            .eq("worker_id", w.id)
+            .in("status", ["accepted", "on_the_way", "arrived", "working"])
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Error getActiveJob:", error);
+            return null;
+        }
+        return data;
+    }
+
+    /* ---------------------------
+       STATUS PILL
+    ----------------------------*/
     function statusPill(status) {
         let cls = "s-pending";
         if (status === "accepted") cls = "s-accepted";
         if (status === "on_the_way") cls = "s-on_the_way";
+        if (status === "arrived") cls = "s-arrived";
         if (status === "working") cls = "s-working";
         if (status === "complete") cls = "s-complete";
         if (status === "cancelled") cls = "s-cancelled";
@@ -280,18 +496,84 @@ document.addEventListener("DOMContentLoaded", async () => {
         return `https://www.google.com/maps/search/?api=1&query=${q}`;
     }
 
+    /* ---------------------------
+       OVERLAY UI UPDATE
+    ----------------------------*/
+    async function updateOverlayAndFab() {
+        await ensureWorkerStatusRow();
+        const statusRow = await getWorkerStatus();
+        const isOnline = statusRow && statusRow.is_online;
+
+        // Count available jobs (last 5 minutes)
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const { data: jobs, error } = await supabase
+            .from("jobs")
+            .select("id")
+            .is("worker_id", null)
+            .eq("status", "pending")
+            .gte("created_at", fiveMinutesAgo);
+
+        let count = 0;
+        if (!error && jobs) count = jobs.length;
+
+        const jobsText =
+            count === 0
+            ? "No new jobs available in the last 5 minutes."
+            : (count === 1
+                ? "There is 1 new job available in the last 5 minutes."
+                : `There are ${count} new jobs available in the last 5 minutes.`);
+
+        overlayJobsText.textContent = jobsText;
+
+        if (isOnline) {
+            overlayStatusText.textContent = "You are currently ONLINE";
+            statusOverlay.style.display = "none";
+            fabOffline.style.display = "block";
+        } else {
+            overlayStatusText.textContent = "You are currently OFFLINE";
+            statusOverlay.style.display = "flex";
+            fabOffline.style.display = "none";
+        }
+    }
+
+    /* ---------------------------
+       LOAD AVAILABLE JOBS
+       - Only if worker is ONLINE
+       - Only jobs from last 5 minutes
+       - Worker cannot accept if has active job
+    ----------------------------*/
     async function loadAvailable() {
+        const status = await getWorkerStatus();
+
+        availableList.innerHTML = "";
+
+        if (!status || !status.is_online) {
+            availableList.innerHTML = `<div class="empty-message">
+                You are currently <b>offline</b>. Switch to Online to see available jobs.
+            </div>`;
+            return;
+        }
+
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
         const { data: jobs, error } = await supabase
             .from("jobs")
             .select("*")
             .is("worker_id", null)
             .eq("status", "pending")
+            .gte("created_at", fiveMinutesAgo)
             .order("created_at", { ascending: true });
 
         availableList.innerHTML = "";
 
+        if (error) {
+            console.error("Error loadAvailable:", error);
+            availableList.innerHTML = `<div class="empty-message">Error loading jobs.</div>`;
+            return;
+        }
+
         if (!jobs || jobs.length === 0) {
-            availableList.innerHTML = `<div class="empty-message">No hay trabajos disponibles.</div>`;
+            availableList.innerHTML = `<div class="empty-message">No available jobs right now.</div>`;
             return;
         }
 
@@ -305,75 +587,99 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <div class="job-header">
                     <div class="job-title-block">
                         <div class="job-title">${job.title}</div>
-                        <div class="job-client">Cliente: ${job.client_name}</div>
+                        <div class="job-client">Client: ${job.client_name}</div>
                     </div>
                     <div class="job-price">$${price}</div>
                 </div>
                 <div class="job-body">
-                    <div class="job-row"><b>Categoría:</b> ${job.category}</div>
-                    <div class="job-row"><b>Dirección:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
-                    <div class="job-row"><b>Pago:</b> ${job.payment_methods}</div>
-                    <div class="job-row"><b>Detalles:</b> ${job.description}</div>
+                    <div class="job-row"><b>Category:</b> ${job.category}</div>
+                    <div class="job-row"><b>Address:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
+                    <div class="job-row"><b>Payment:</b> ${job.payment_methods}</div>
+                    <div class="job-row"><b>Details:</b> ${job.description}</div>
                     ${statusPill(job.status)}
                 </div>
                 <div class="job-footer">
-                    <button class="action-btn-main">Aceptar trabajo</button>
-                    <button class="action-btn-secondary">Ver en Maps</button>
+                    <button class="action-btn-main">Accept Job</button>
+                    <button class="action-btn-secondary">Open in Maps</button>
                 </div>
             `;
 
-            // BOTÓN ACEPTAR (YA ARREGLADO)
             div.querySelector(".action-btn-main").addEventListener("click", async () => {
-                const { error: errUpdate } = await supabase
-                    .from("jobs")
-                    .update({
-                        worker_id: w.id,
-                        worker_name: w.full_name,
-                        worker_phone: w.phone,
-                        worker_photo: w.profile_image,   // ← ESTE FALTABA
-                        status: "accepted"
-                    })
-                    .eq("id", job.id)
-                    .is("worker_id", null);
-
-                if (errUpdate) {
-                    console.error(errUpdate);
-                    alert("No se pudo aceptar. Intenta de nuevo.");
+                // Check if worker already has active job
+                const active = await getActiveJob();
+                if (active) {
+                    alert("You already have an active job. Complete or cancel it before accepting a new one.");
                     return;
                 }
 
-                alert("Trabajo aceptado.");
+                const { error: err } = await supabase.from("jobs").update({
+                    worker_id: w.id,
+                    worker_name: w.full_name,
+                    worker_phone: w.phone,
+                    worker_photo: w.profile_image,
+                    status: "accepted"
+                })
+                .eq("id", job.id)
+                .is("worker_id", null);
+
+                if (err) {
+                    console.error("Error accepting job:", err);
+                    alert("Could not accept job. Try again.");
+                    return;
+                }
+
+                alert("Job accepted.");
                 await loadAll();
             });
 
             div.querySelector(".action-btn-secondary")
-               .addEventListener("click", () => window.open(mapsLink(job), "_blank"));
+                .addEventListener("click", () => window.open(mapsLink(job), "_blank"));
 
             availableList.appendChild(div);
         });
     }
 
+    /* ---------------------------
+       UPDATE JOB STATUS
+    ----------------------------*/
     async function updateStatus(jobId, newStatus) {
-        await supabase
+        const { error } = await supabase
             .from("jobs")
             .update({ status: newStatus })
             .eq("id", jobId)
             .eq("worker_id", w.id);
 
+        if (error) {
+            console.error("Error updateStatus:", error);
+            alert("Could not update job status.");
+            return;
+        }
+
         await loadAll();
     }
 
+    /* ---------------------------
+       LOAD MY JOBS (ACTIVE)
+    ----------------------------*/
     async function loadMyJobs() {
-        const { data: jobs } = await supabase
+        const { data: jobs, error } = await supabase
             .from("jobs")
             .select("*")
             .eq("worker_id", w.id)
+            .neq("status", "complete")
+            .neq("status", "cancelled")
             .order("created_at", { ascending: false });
 
         myJobsList.innerHTML = "";
 
+        if (error) {
+            console.error("Error loadMyJobs:", error);
+            myJobsList.innerHTML = `<div class="empty-message">Error loading your jobs.</div>`;
+            return;
+        }
+
         if (!jobs || jobs.length === 0) {
-            myJobsList.innerHTML = `<div class="empty-message">No tienes trabajos aún.</div>`;
+            myJobsList.innerHTML = `<div class="empty-message">You have no active jobs.</div>`;
             return;
         }
 
@@ -387,31 +693,37 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <div class="job-header">
                     <div class="job-title-block">
                         <div class="job-title">${job.title}</div>
-                        <div class="job-client">Cliente: ${job.client_name}</div>
+                        <div class="job-client">Client: ${job.client_name}</div>
+                        <div class="job-client"><b>Phone:</b> 
+                            <a href="tel:${job.client_phone}" style="color:#81ecec">
+                                ${job.client_phone}
+                            </a>
+                        </div>
                     </div>
                     <div class="job-price">$${price}</div>
                 </div>
                 <div class="job-body">
-                    <div class="job-row"><b>Categoría:</b> ${job.category}</div>
-                    <div class="job-row"><b>Dirección:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
-                    <div class="job-row"><b>Pago:</b> ${job.payment_methods}</div>
-                    <div class="job-row"><b>Detalles:</b> ${job.description}</div>
+                    <div class="job-row"><b>Category:</b> ${job.category}</div>
+                    <div class="job-row"><b>Address:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
+                    <div class="job-row"><b>Payment:</b> ${job.payment_methods}</div>
+                    <div class="job-row"><b>Details:</b> ${job.description}</div>
                     ${statusPill(job.status)}
                 </div>
-                <div class="job-footer" id="actions-${job.id}">
-                    <button class="action-btn-secondary">Ver en Maps</button>
-                </div>
+                <div class="job-footer" id="actions-${job.id}"></div>
             `;
 
-            div.querySelector(".action-btn-secondary")
-                .addEventListener("click", () => window.open(mapsLink(job), "_blank"));
-
             const actions = div.querySelector(`#actions-${job.id}`);
+
+            const mapsBtn = document.createElement("button");
+            mapsBtn.className = "action-btn-secondary";
+            mapsBtn.textContent = "Open in Maps";
+            mapsBtn.onclick = () => window.open(mapsLink(job), "_blank");
+            actions.appendChild(mapsBtn);
 
             if (job.status === "accepted") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
-                btn.textContent = "Marcar: En camino";
+                btn.textContent = "Mark: On the Way";
                 btn.onclick = () => updateStatus(job.id, "on_the_way");
                 actions.appendChild(btn);
             }
@@ -419,7 +731,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (job.status === "on_the_way") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
-                btn.textContent = "Marcar: Trabajando";
+                btn.textContent = "Mark: Arrived";
+                btn.onclick = () => updateStatus(job.id, "arrived");
+                actions.appendChild(btn);
+            }
+
+            if (job.status === "arrived") {
+                const btn = document.createElement("button");
+                btn.className = "action-btn-main";
+                btn.textContent = "Mark: Working";
                 btn.onclick = () => updateStatus(job.id, "working");
                 actions.appendChild(btn);
             }
@@ -427,51 +747,207 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (job.status === "working") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
-                btn.textContent = "Marcar: Completado";
+                btn.textContent = "Mark: Completed";
                 btn.onclick = () => updateStatus(job.id, "complete");
                 actions.appendChild(btn);
-            }
-
-            if (job.status === "complete") {
-                const done = document.createElement("div");
-                done.className = "job-row";
-                done.style.color = "#00d98b";
-                done.textContent = "✔ Trabajo completado";
-                actions.appendChild(done);
-            }
-
-            if (job.status === "cancelled") {
-                const can = document.createElement("div");
-                can.className = "job-row";
-                can.style.color = "#ff7675";
-                can.textContent = "✖ Cancelado por el cliente";
-                actions.appendChild(can);
             }
 
             myJobsList.appendChild(div);
         });
     }
 
-    async function loadAll() {
-        await loadAvailable();
-        await loadMyJobs();
+    /* ---------------------------
+       LOAD COMPLETED JOBS
+    ----------------------------*/
+    async function loadCompleted() {
+        const { data: jobs, error } = await supabase
+            .from("jobs")
+            .select("*")
+            .eq("worker_id", w.id)
+            .eq("status", "complete")
+            .order("created_at", { ascending: false });
+
+        completedList.innerHTML = "";
+
+        if (error) {
+            console.error("Error loadCompleted:", error);
+            completedList.innerHTML = `<div class="empty-message">Error loading completed jobs.</div>`;
+            return;
+        }
+
+        if (!jobs || jobs.length === 0) {
+            completedList.innerHTML = `<div class="empty-message">No completed jobs.</div>`;
+            return;
+        }
+
+        jobs.forEach(job => {
+            const div = document.createElement("div");
+            div.className = "job-card";
+
+            const price = job.price?.toFixed ? job.price.toFixed(2) : "0.00";
+
+            div.innerHTML = `
+                <div class="job-header">
+                    <div class="job-title">${job.title}</div>
+                    <div class="job-price">$${price}</div>
+                </div>
+                <div class="job-body">
+                    <div class="job-row"><b>Client:</b> ${job.client_name}</div>
+                    <div class="job-row"><b>Phone:</b> ${job.client_phone}</div>
+                    <div class="job-row"><b>Address:</b> ${job.street}, ${job.city}</div>
+                    ${statusPill("complete")}
+                </div>
+            `;
+            completedList.appendChild(div);
+        });
     }
 
+    /* ---------------------------
+       TABS
+    ----------------------------*/
     function showAvailable() {
         tabAvailable.classList.add("tab-btn-active");
         tabMyJobs.classList.remove("tab-btn-active");
+        tabCompleted.classList.remove("tab-btn-active");
+
         availableList.style.display = "block";
         myJobsList.style.display = "none";
+        completedList.style.display = "none";
     }
+
     function showMyJobs() {
         tabMyJobs.classList.add("tab-btn-active");
         tabAvailable.classList.remove("tab-btn-active");
+        tabCompleted.classList.remove("tab-btn-active");
+
         availableList.style.display = "none";
         myJobsList.style.display = "block";
+        completedList.style.display = "none";
+    }
+
+    function showCompleted() {
+        tabCompleted.classList.add("tab-btn-active");
+        tabAvailable.classList.remove("tab-btn-active");
+        tabMyJobs.classList.remove("tab-btn-active");
+
+        availableList.style.display = "none";
+        myJobsList.style.display = "none";
+        completedList.style.display = "block";
     }
 
     tabAvailable.addEventListener("click", showAvailable);
     tabMyJobs.addEventListener("click", showMyJobs);
+    tabCompleted.addEventListener("click", showCompleted);
+
+    /* ---------------------------
+       GO ONLINE (BIG OVERLAY BUTTON)
+    ----------------------------*/
+    btnGoOnline.addEventListener("click", async () => {
+        await setWorkerOnlineState(true);
+        await updateOverlayAndFab();
+        await loadAll();
+        showAvailable();
+    });
+
+    /* ---------------------------
+       GO OFFLINE (FLOATING BUTTON)
+    ----------------------------*/
+    function openDialog() {
+        dialogOverlay.style.display = "flex";
+    }
+    function closeDialog() {
+        dialogOverlay.style.display = "none";
+        activeJobCache = null;
+    }
+
+    fabOffline.addEventListener("click", async () => {
+        // Check if there is an active job
+        const active = await getActiveJob();
+        activeJobCache = active || null;
+
+        if (!active) {
+            // Simple confirm: go offline
+            dialogTitle.textContent = "Go Offline?";
+            dialogText.textContent = "Are you sure you want to go offline? You won't receive new jobs.";
+            dialogPrimary.textContent = "Yes, go offline";
+            dialogDanger.style.display = "none";
+            dialogGhost.textContent = "Cancel";
+
+            dialogPrimary.onclick = async () => {
+                await setWorkerOnlineState(false);
+                await updateOverlayAndFab();
+                await loadAll();
+                closeDialog();
+            };
+
+            dialogGhost.onclick = () => {
+                closeDialog();
+            };
+
+            openDialog();
+        } else {
+            // Has active job
+            dialogTitle.textContent = "Active Job in Progress";
+            dialogText.textContent =
+                "You currently have an active job. You must complete it or cancel it before going offline.";
+            dialogPrimary.textContent = "Go to My Job";
+            dialogDanger.textContent = "Cancel Job";
+            dialogDanger.style.display = "block";
+            dialogGhost.textContent = "Stay Online";
+
+            dialogPrimary.onclick = () => {
+                // Simply open My Jobs tab
+                showMyJobs();
+                closeDialog();
+            };
+
+            dialogDanger.onclick = async () => {
+                // Cancel job: return it to the pool
+                const job = activeJobCache;
+                if (!job) return;
+
+                const { error } = await supabase
+                    .from("jobs")
+                    .update({
+                        worker_id: null,
+                        worker_name: null,
+                        worker_phone: null,
+                        worker_photo: null,
+                        status: "pending"
+                    })
+                    .eq("id", job.id);
+
+                if (error) {
+                    console.error("Error cancelling job:", error);
+                    alert("Could not cancel the job. Try again.");
+                    return;
+                }
+
+                // Now go offline
+                await setWorkerOnlineState(false);
+                await updateOverlayAndFab();
+                await loadAll();
+                closeDialog();
+            };
+
+            dialogGhost.onclick = () => {
+                // Stay online
+                closeDialog();
+            };
+
+            openDialog();
+        }
+    });
+
+    /* ---------------------------
+       LOAD EVERYTHING
+    ----------------------------*/
+    async function loadAll() {
+        await loadAvailable();
+        await loadMyJobs();
+        await loadCompleted();
+        await updateOverlayAndFab();
+    }
 
     await loadAll();
     showAvailable();
@@ -486,35 +962,77 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="brand-logo">F</div>
         <div class="brand-txt">
             <div class="t1">FIXALL</div>
-            <div class="t2">Panel del trabajador</div>
+            <div class="t2">Worker Dashboard</div>
         </div>
     </div>
-    <div class="worker-chip" id="workerNameChip">Trabajador</div>
+    <div class="worker-chip" id="workerNameChip">Worker</div>
 </div>
 
+<!-- FULLSCREEN STATUS OVERLAY -->
+<div id="statusOverlay" class="status-overlay">
+    <div class="status-card">
+        <div class="status-badge">
+            <span class="status-dot-big" style="background:#ff7675;"></span>
+            <span id="overlayStatusText">You are currently OFFLINE</span>
+        </div>
+        <div class="status-title">Ready to work?</div>
+        <div class="status-subtitle">
+            Go online to start receiving FIXALL jobs nearby.
+        </div>
+        <div class="status-jobs" id="overlayJobsText">
+            Checking available jobs...
+        </div>
+        <button id="btnGoOnline" class="status-btn">Go Online</button>
+    </div>
+</div>
+
+<!-- GO OFFLINE DIALOG -->
+<div id="dialogOverlay" class="dialog-overlay">
+    <div class="dialog-card">
+        <div class="dialog-title" id="dialogTitle">Go Offline?</div>
+        <div class="dialog-text" id="dialogText">
+            Are you sure you want to go offline?
+        </div>
+        <div class="dialog-actions">
+            <button id="dialogPrimary" class="dialog-btn-primary">Yes</button>
+            <button id="dialogDanger" class="dialog-btn-danger" style="display:none;">Cancel Job</button>
+            <button id="dialogGhost" class="dialog-btn-ghost">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- TABS -->
 <div class="tabs">
-    <div id="tabAvailable" class="tab-btn tab-btn-active">Disponibles</div>
-    <div id="tabMyJobs" class="tab-btn">Mis trabajos</div>
+    <div id="tabAvailable" class="tab-btn tab-btn-active">Available</div>
+    <div id="tabMyJobs" class="tab-btn">My Jobs</div>
+    <div id="tabCompleted" class="tab-btn">Completed</div>
 </div>
 
-<div class="section-title">Trabajos disponibles</div>
+<div class="section-title">Available Jobs</div>
 <div id="availableJobs"></div>
 
-<div class="section-title">Mis trabajos asignados</div>
+<div class="section-title">My Jobs</div>
 <div id="myJobs" style="display:none;"></div>
 
+<div class="section-title">Completed Jobs</div>
+<div id="completedJobs" style="display:none;"></div>
+
+<!-- FLOATING GO OFFLINE BUTTON -->
+<button id="fabOffline" class="fab-offline">🔴 Go Offline</button>
+
+<!-- NAV -->
 <div class="bottom-nav">
     <a class="nav-btn nav-btn-active" href="/worker/dashboard.html">
         <span>🛠️</span>
-        Trabajos
+        Jobs
     </a>
     <a class="nav-btn" href="/worker/profile.html">
         <span>👤</span>
-        Perfil
+        Profile
     </a>
     <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
         <span>🚪</span>
-        Salir
+        Logout
     </a>
 </div>
 

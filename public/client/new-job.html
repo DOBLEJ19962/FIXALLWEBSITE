@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Nuevo Trabajo - FIXALL</title>
+<title>New Job - FIXALL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -77,6 +77,12 @@ input, textarea, select {
     color: var(--text-main);
     font-size: 16px;
     box-sizing: border-box;
+}
+
+/* Fix for dropdown visibility */
+select, select option {
+    background-color: #1a1633;
+    color: white;
 }
 
 input::placeholder, textarea::placeholder {
@@ -186,12 +192,12 @@ document.addEventListener("DOMContentLoaded", () => {
         errorPayments.style.display = "none";
 
         if (!title || !description || !category || !priceVal) {
-            alert("Completa todos los campos.");
+            alert("Please fill out all fields.");
             return;
         }
 
         if (isNaN(price) || price <= 0) {
-            alert("Introduce un monto válido mayor que 0.");
+            alert("Enter a valid amount greater than 0.");
             return;
         }
 
@@ -224,11 +230,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (error) {
             console.error(error);
-            alert("Error creando trabajo: " + error.message);
+            alert("Error creating job: " + error.message);
             return;
         }
 
-        alert("Tu trabajo fue enviado. Un trabajador FIXALL lo verá pronto.");
+        alert("Your job has been sent. A FIXALL worker will see it soon.");
         location.href = "/client/dashboard.html";
     });
 });
@@ -237,55 +243,55 @@ document.addEventListener("DOMContentLoaded", () => {
 </head>
 <body>
 
-<div class="topbar">Nuevo Trabajo</div>
+<div class="topbar">New Job</div>
 
 <div class="box">
 
-    <label>Título del trabajo</label>
-    <input id="title" type="text" placeholder="Ej: Revisar breaker eléctrico">
+    <label>Job Title</label>
+    <input id="title" type="text" placeholder="Example: Fix electrical breaker">
 
-    <label>Categoría</label>
+    <label>Category</label>
     <select id="category">
-        <option value="">Selecciona una categoría</option>
-        <option>Electricidad</option>
-        <option>Plomería</option>
-        <option>Pintura</option>
-        <option>Limpieza de casa</option>
-        <option>Limpieza profunda</option>
-        <option>Corte de césped</option>
-        <option>Jardinería</option>
-        <option>Reparación de techo</option>
-        <option>Mantenimiento de AC</option>
-        <option>Reparación de electrodomésticos</option>
-        <option>Mecánica (auto en casa)</option>
-        <option>Mudanza y carga</option>
-        <option>Instalación de TV</option>
-        <option>Montar muebles</option>
-        <option>Cerrajería</option>
-        <option>Handyman general</option>
-        <option>Lavado a presión</option>
-        <option>Limpieza de alfombras</option>
-        <option>Otro</option>
+        <option value="">Select a category</option>
+        <option>Electrician</option>
+        <option>Plumber</option>
+        <option>Painter</option>
+        <option>House Cleaning</option>
+        <option>Deep Cleaning</option>
+        <option>Lawn Cutting</option>
+        <option>Gardening</option>
+        <option>Roof Repair</option>
+        <option>AC Maintenance</option>
+        <option>Appliance Repair</option>
+        <option>Mechanic (Home Auto)</option>
+        <option>Moving / Heavy Lifting</option>
+        <option>TV Installation</option>
+        <option>Furniture Assembly</option>
+        <option>Locksmith</option>
+        <option>General Handyman</option>
+        <option>Pressure Washing</option>
+        <option>Carpet Cleaning</option>
+        <option>Other</option>
     </select>
 
-    <label>Descripción</label>
-    <textarea id="description" placeholder="Explica bien qué hay que hacer, ubicación exacta, horarios disponibles, etc."></textarea>
+    <label>Description</label>
+    <textarea id="description" placeholder="Explain clearly what needs to be done, exact location, available times, etc."></textarea>
 
-    <label>¿Cuánto pagarás? (USD)</label>
-    <input id="price" type="number" min="1" step="0.01" placeholder="Ej: 120">
+    <label>How much will you pay? (USD)</label>
+    <input id="price" type="number" min="1" step="0.01" placeholder="Example: 120">
 
-    <label>Métodos de pago aceptados</label>
+    <label>Accepted Payment Methods</label>
     <div class="methods">
         <label><input type="checkbox" name="paymentMethod" value="Cash">Cash</label>
         <label><input type="checkbox" name="paymentMethod" value="Zelle">Zelle</label>
         <label><input type="checkbox" name="paymentMethod" value="CashApp">CashApp</label>
     </div>
 
-    <div id="errorPayments">Selecciona al menos un método de pago.</div>
+    <div id="errorPayments">Select at least one payment method.</div>
 
-    <p class="help">Esta información será visible para el trabajador al aceptar tu trabajo.</p>
+    <p class="help">This information will be visible to the worker when they accept your job.</p>
 
-    <button id="sendBtn">Enviar Trabajo</button>
+    <button id="sendBtn">Submit Job</button>
 
 </div>
 

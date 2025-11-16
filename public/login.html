@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Iniciar Sesión - FIXALL</title>
+<title>Login - FIXALL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -17,7 +17,6 @@
     --border: rgba(255,255,255,0.18);
 }
 
-/* BODY FULL CENTER FIX */
 body {
     margin: 0;
     padding: 0;
@@ -32,14 +31,12 @@ body {
     box-sizing: border-box;
 }
 
-/* FIX WRAPPER FOR PERFECT CENTER (same as register.html) */
 .wrapper {
     width: 100%;
     max-width: 420px;
     padding: 20px;
 }
 
-/* FORM CARD */
 .box {
     width: 100%;
     background: var(--glass);
@@ -53,7 +50,6 @@ body {
     color: var(--text-main);
 }
 
-/* FIXALL LOGO */
 .logo {
     font-size: 42px;
     font-weight: 900;
@@ -72,7 +68,6 @@ h2 {
     margin-bottom: 25px;
 }
 
-/* INPUTS FIXED CENTER AND SPACING */
 input {
     width: 100%;
     padding: 15px;
@@ -96,7 +91,6 @@ input:focus {
     box-shadow: 0 0 0 2px rgba(108,92,231,0.6);
 }
 
-/* BUTTON */
 button {
     width: 100%;
     padding: 15px;
@@ -114,11 +108,6 @@ button {
     cursor: pointer;
 }
 
-button:active {
-    transform: scale(0.97);
-}
-
-/* BOTTOM TEXT */
 p {
     margin-top: 20px;
     text-align: center;
@@ -138,33 +127,36 @@ a {
 }
 </style>
 
-<script type="module" src="/js/auth.js"></script>
 </head>
-
 <body>
 
 <div class="wrapper">
 
     <div class="box">
+        
         <div class="logo">FIXALL</div>
-        <h2>Iniciar Sesión</h2>
 
-        <input id="email" type="email" placeholder="Correo electrónico">
-        <input id="password" type="password" placeholder="Contraseña">
+        <h2>Login</h2>
 
-        <button id="loginBtn">Entrar</button>
+        <input id="email" type="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
 
-        <p>¿No tienes cuenta?
-            <a href="/register.html">Regístrate</a>
+        <button id="loginBtn">Login</button>
+
+        <p>
+            Don't have an account? 
+            <a href="/register.html">Register</a>
         </p>
 
         <p>
-    <a href="/forgot.html">¿Olvidaste tu contraseña?</a>
-</p>
+            <a href="/forgot.html">Forgot your password?</a>
+        </p>
 
     </div>
 
 </div>
+
+<script type="module" src="/js/auth.js"></script>
 
 </body>
 </html>

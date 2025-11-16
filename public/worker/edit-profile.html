@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Editar Perfil - Trabajador FIXALL</title>
+<title>Edit Profile - FIXALL Worker</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // Campos
+    // Fields
     const nameEl = document.getElementById("name");
     const phoneEl = document.getElementById("phone");
     const emailEl = document.getElementById("email");
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const warnEl = document.getElementById("warn");
     const fileInput = document.getElementById("fileInput");
 
-    // Cargar datos
+    // Load data
     nameEl.value = u.full_name;
     phoneEl.value = u.phone;
     emailEl.value = u.email;
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!u.profile_image) warnEl.style.display = "block";
 
     // -------------------------
-    // 🔥 FUNCIÓN SUBIDA FOTO
+    // 🔥 UPLOAD PROFILE PHOTO
     // -------------------------
     async function uploadProfile(file) {
         const ext = file.name.split(".").pop();
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
 
         if (uploadError) {
-            alert("Error subiendo imagen: " + uploadError.message);
+            alert("Error uploading image: " + uploadError.message);
             return null;
         }
 
@@ -206,9 +206,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return urlData.publicUrl;
     }
 
-    // -------------------------
-    // 🔥 Evento subir foto
-    // -------------------------
+    // 🔥 Upload event
     fileInput.addEventListener("change", async () => {
         const file = fileInput.files[0];
         if (!file) return;
@@ -222,12 +220,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // -------------------------
-    // 🔥 Guardar cambios
+    // 🔥 SAVE CHANGES
     // -------------------------
     document.getElementById("saveBtn").addEventListener("click", async () => {
 
         if (!u.profile_image) {
-            alert("Debes subir una foto de perfil.");
+            alert("You must upload a profile picture.");
             return;
         }
 
@@ -248,13 +246,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             .single();
 
         if (error) {
-            alert("Error guardando: " + error.message);
+            alert("Error saving: " + error.message);
             return;
         }
 
         localStorage.setItem("fixall_user", JSON.stringify(data));
 
-        alert("Perfil actualizado.");
+        alert("Profile updated successfully.");
         location.href = "/worker/profile.html";
     });
 
@@ -264,7 +262,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 </head>
 <body>
 
-<div class="topbar">Editar Perfil</div>
+<div class="topbar">Edit Profile</div>
 
 <div class="card">
 
@@ -273,36 +271,36 @@ document.addEventListener("DOMContentLoaded", async () => {
             <img id="avatarImg">
         </div>
         <label class="upload-btn">
-            Subir foto
+            Upload photo
             <input type="file" id="fileInput" accept="image/*" style="display:none;">
         </label>
 
         <div class="warning" id="warn">
-            ⚠ Debes subir una foto de perfil obligatoriamente.
+            ⚠ You must upload a profile picture.
         </div>
     </div>
 
-    <label>Nombre completo</label>
+    <label>Full Name</label>
     <input id="name" type="text">
 
-    <label>Correo electrónico</label>
+    <label>Email</label>
     <input id="email" type="email">
 
-    <label>Teléfono</label>
+    <label>Phone</label>
     <input id="phone" type="tel">
 
-    <label>Años de experiencia</label>
+    <label>Years of Experience</label>
     <input id="experience" type="number" min="0">
 
-    <label>Sobre ti</label>
-    <textarea id="about" placeholder="Cuéntale a los clientes sobre tu experiencia, áreas donde trabajas, etc."></textarea>
+    <label>About You</label>
+    <textarea id="about" placeholder="Tell clients about your experience, work areas, skills, etc."></textarea>
 
-    <button id="saveBtn">Guardar Cambios</button>
+    <button id="saveBtn">Save Changes</button>
 </div>
 
 <div class="bottom-nav">
-    <a href="/worker/dashboard.html"><span>📋</span>Trabajos</a>
-    <a href="/worker/profile.html"><span>👤</span>Perfil</a>
+    <a href="/worker/dashboard.html"><span>📋</span>Jobs</a>
+    <a href="/worker/profile.html"><span>👤</span>Profile</a>
 </div>
 
 </body>

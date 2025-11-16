@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Editar Perfil - FIXALL</title>
+<title>Edit Profile - FIXALL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -41,7 +41,7 @@ body {
     top: 0;
 }
 
-/* PROFILE CARD */
+/* PROFILE BOX */
 .profile-box {
     margin: 20px auto;
     max-width: 430px;
@@ -98,7 +98,7 @@ button:active {
     transform: scale(0.98);
 }
 
-/* BOTTOM NAV */
+/* NAV BAR */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const stateEl = document.getElementById("state");
   const zipcodeEl = document.getElementById("zipcode");
 
-  // Load existing profile data
+  // Load user data
   nameEl.value = u.full_name || "";
   emailEl.value = u.email || "";
   phoneEl.value = u.phone || "";
@@ -173,11 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const { error } = await updateProfile(updated, u.id);
 
     if (error) {
-      alert("Error actualizando: " + error.message);
+      alert("Error updating profile: " + error.message);
     } else {
-      alert("Perfil actualizado correctamente");
+      alert("Profile updated successfully");
 
-      // Update localStorage
+      // Update local storage
       const newUser = { ...u, ...updated };
       localStorage.setItem("fixall_user", JSON.stringify(newUser));
 
@@ -190,44 +190,44 @@ document.addEventListener("DOMContentLoaded", () => {
 </head>
 <body>
 
-<div class="topbar">Editar Perfil</div>
+<div class="topbar">Edit Profile</div>
 
 <div class="profile-box">
 
-  <label>Nombre completo</label>
+  <label>Full Name</label>
   <input id="name" type="text">
 
-  <label>Correo electrónico</label>
+  <label>Email</label>
   <input id="email" type="email">
 
-  <label>Teléfono</label>
+  <label>Phone</label>
   <input id="phone" type="tel">
 
-  <label>Calle</label>
+  <label>Street</label>
   <input id="street" type="text">
 
-  <label>Ciudad</label>
+  <label>City</label>
   <input id="city" type="text">
 
-  <label>Estado</label>
+  <label>State</label>
   <input id="state" type="text">
 
   <label>ZIP Code</label>
   <input id="zipcode" type="text">
 
-  <button id="saveBtn">Guardar cambios</button>
+  <button id="saveBtn">Save Changes</button>
 
 </div>
 
 <div class="bottom-nav">
   <a class="nav-btn" href="/client/dashboard.html">
-    <span>🏠</span> Inicio
+    <span>🏠</span> Home
   </a>
   <a class="nav-btn nav-btn-active" href="/client/profile.html">
-    <span>👤</span> Perfil
+    <span>👤</span> Profile
   </a>
   <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
-    <span>🚪</span> Salir
+    <span>🚪</span> Logout
   </a>
 </div>
 

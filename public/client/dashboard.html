@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>FIXALL - Panel del Cliente</title>
+<title>FIXALL - Client Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -63,8 +63,6 @@ body {
     border-radius: 999px;
     padding: 6px 12px;
     border: 1px solid rgba(255,255,255,0.1);
-    display: flex;
-    flex-direction: column;
     text-align: right;
 }
 .support-chip a { color: #fff; font-weight: 600; text-decoration:none; }
@@ -230,17 +228,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         jobsList.innerHTML = "";
 
         if (error) {
-            jobsList.innerHTML = `<div class="empty-message">Error cargando trabajos.</div>`;
+            jobsList.innerHTML = `<div class="empty-message">Error loading jobs.</div>`;
             return;
         }
 
         let active = jobs.filter(j =>
             ["pending", "accepted", "on_the_way", "working"].includes(j.status)
         ).length;
-        document.getElementById("heroActive").textContent = `${active} activo(s)`;
+
+        document.getElementById("heroActive").textContent = `${active} active`;
 
         if (jobs.length === 0) {
-            jobsList.innerHTML = `<div class="empty-message">Aún no has creado trabajos.</div>`;
+            jobsList.innerHTML = `<div class="empty-message">You haven't created any jobs yet.</div>`;
             return;
         }
 
@@ -249,12 +248,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             div.className = "job-card";
 
             let statusClass = "s-" + job.status;
-
             const price = job.price ?? "0.00";
 
             div.innerHTML = `
                 <div class="job-header">
-                    <div class="job-title-block">
+                    <div>
                         <div class="job-title">${job.title}</div>
                         <div class="job-category">${job.category}</div>
                     </div>
@@ -262,12 +260,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
 
                 <div class="job-body">
-                    <div class="job-row"><b>Dirección:</b> ${job.street}, ${job.city}</div>
-                    <div class="job-row"><b>Método de pago:</b> ${job.payment_methods}</div>
-                    <div class="job-row"><b>Detalles:</b> ${job.description}</div>
+                    <div><b>Address:</b> ${job.street}, ${job.city}</div>
+                    <div><b>Payment method:</b> ${job.payment_methods}</div>
+                    <div><b>Details:</b> ${job.description}</div>
 
                     <div class="status-pill ${statusClass}">
-                        <span class="status-dot"></span> ${job.status}
+                        <span class="status-dot"></span> ${job.status.replace("_", " ")}
                     </div>
                 </div>
 
@@ -282,27 +280,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     <img src="${job.worker_photo || '/img/nouser.png'}"
          style="width:45px; height:45px; border-radius:50%; border:2px solid rgba(255,255,255,0.2); object-fit:cover;">
     <div>
-        <b>Trabajador:</b> ${job.worker_name}<br>
-        <b>Tel:</b> <a href="tel:${job.worker_phone}" style="color:#81ecec;">${job.worker_phone}</a>
+        <b>Worker:</b> ${job.worker_name}<br>
+        <b>Phone:</b> <a href="tel:${job.worker_phone}" style="color:#81ecec;">${job.worker_phone}</a>
     </div>
 </div>
 `
                             :
-                            "Aún no hay trabajador asignado."
+                            "No worker assigned yet."
                         }
                     </div>
 
                 </div>
             `;
 
-            // CANCEL OPTION
+            // CANCEL JOB
             if (["pending","accepted","on_the_way"].includes(job.status)) {
                 const btn = document.createElement("div");
                 btn.className = "btn-cancel";
-                btn.textContent = "Cancelar trabajo";
+                btn.textContent = "Cancel Job";
 
                 btn.onclick = async () => {
-                    if (!confirm("¿Seguro que quieres cancelar este trabajo?")) return;
+                    if (!confirm("Are you sure you want to cancel this job?")) return;
 
                     const { error } = await supabase
                         .from("jobs")
@@ -310,7 +308,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         .eq("id", job.id);
 
                     if (error) {
-                        alert("No se pudo cancelar.");
+                        alert("Could not cancel this job.");
                         return;
                     }
 
@@ -337,11 +335,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="brand-logo">F</div>
         <div class="brand-text">
             <div class="title">FIXALL</div>
-            <div class="subtitle">Servicios a domicilio</div>
+            <div class="subtitle">Home Services</div>
         </div>
     </div>
     <div class="support-chip">
-        <span>Soporte 24/7</span>
+        <span>Support 24/7</span>
         <a href="tel:+18338345028">833-834-5028</a>
     </div>
 </div>
@@ -349,42 +347,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 <!-- HERO -->
 <div class="hero-card">
     <div class="hero-left">
-        <div class="hero-greet">Hola,</div>
-        <div class="hero-name" id="heroName">Cliente</div>
-        <div class="hero-small">Aquí puedes ver todos tus trabajos.</div>
+        <div class="hero-greet">Hello,</div>
+        <div class="hero-name" id="heroName">Client</div>
+        <div class="hero-small">Here you can see all your jobs.</div>
         <div class="hero-stats">
-            <div class="hero-stat-pill" id="heroActive">0 activo(s)</div>
-            <div class="hero-stat-pill">Pagos & soporte</div>
+            <div class="hero-stat-pill" id="heroActive">0 active</div>
+            <div class="hero-stat-pill">Payments & Support</div>
         </div>
     </div>
     <div class="hero-avatar" id="heroAvatar">C</div>
 </div>
 
-<!-- BUTTON NEW JOB -->
+<!-- NEW JOB BUTTON -->
 <a class="new-job-btn" href="/client/new-job.html">
     <div class="new-job-btn-left">
         <div class="new-job-icon">+</div>
         <div>
-            <div class="new-job-main">Crear nueva solicitud</div>
-            <div class="new-job-sub">Electricidad, plomería, limpieza y más</div>
+            <div class="new-job-main">Create new job request</div>
+            <div class="new-job-sub">Electrician, plumbing, cleaning and more</div>
         </div>
     </div>
     <div class="new-job-chevron">›</div>
 </a>
 
-<div class="section-title">Mis trabajos</div>
+<div class="section-title">My Jobs</div>
 <div id="jobsList"></div>
 
 <!-- NAV -->
 <div class="bottom-nav">
     <a class="nav-btn nav-btn-active" href="/client/dashboard.html">
-        <span>🏠</span>Inicio
+        <span>🏠</span>Home
     </a>
     <a class="nav-btn" href="/client/profile.html">
-        <span>👤</span>Perfil
+        <span>👤</span>Profile
     </a>
     <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
-        <span>🚪</span>Salir
+        <span>🚪</span>Logout
     </a>
 </div>
 

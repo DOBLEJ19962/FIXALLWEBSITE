@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mi Perfil - FIXALL</title>
+<title>My Profile - FIXALL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -177,37 +177,39 @@ document.addEventListener("DOMContentLoaded", () => {
 </head>
 <body>
 
-<div class="topbar">Mi Perfil</div>
+<div class="topbar">My Profile</div>
 
 <div class="profile-card">
   <div class="avatar" id="avatar">U</div>
-  <div class="user-name" id="fullName">Usuario</div>
+  <div class="user-name" id="fullName">User</div>
 </div>
 
 <div class="info-card">
   <div class="row"><b>Email:</b> <span id="email"></span></div>
-  <div class="row"><b>Teléfono:</b> <span id="phone"></span></div>
-  <div class="row"><b>Calle:</b> <span id="street"></span></div>
-  <div class="row"><b>Ciudad:</b> <span id="city"></span></div>
-  <div class="row"><b>Estado:</b> <span id="stateTxt"></span></div>
+  <div class="row"><b>Phone:</b> <span id="phone"></span></div>
+  <div class="row"><b>Street:</b> <span id="street"></span></div>
+  <div class="row"><b>City:</b> <span id="city"></span></div>
+  <div class="row"><b>State:</b> <span id="stateTxt"></span></div>
   <div class="row"><b>ZIP Code:</b> <span id="zipcode"></span></div>
 </div>
 
-<a class="btn btn-edit" href="/client/edit-profile.html">Editar Perfil</a>
-<a class="btn btn-logout" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
-  Cerrar sesión
+<a class="btn btn-edit" href="/client/edit-profile.html">Edit Profile</a>
+
+<a class="btn btn-logout"
+   onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
+   Log Out
 </a>
 
 <!-- NAV BAR -->
 <div class="bottom-nav">
   <a class="nav-btn" href="/client/dashboard.html">
-    <span>🏠</span> Inicio
+    <span>🏠</span> Home
   </a>
   <a class="nav-btn nav-btn-active" href="/client/profile.html">
-    <span>👤</span> Perfil
+    <span>👤</span> Profile
   </a>
   <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
-    <span>🚪</span> Salir
+    <span>🚪</span> Logout
   </a>
 </div>
 

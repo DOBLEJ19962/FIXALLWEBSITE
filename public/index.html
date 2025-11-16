@@ -1,19 +1,17 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>FIXALL - Servicios a Domicilio</title>
+<title>FIXALL - Home Services</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- PWA INTEGRACIÓN -->
+<!-- PWA -->
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/logo/logo.png">
 <meta name="theme-color" content="#6c5ce7">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
-/* PALETA FIXALL */
+/* COLORS */
 :root {
     --primary: #6c5ce7;
     --primary2: #9b59b6;
@@ -23,7 +21,6 @@
     --text-soft: #d7daf9;
 }
 
-/* ESTILO GENERAL */
 body {
     margin: 0;
     padding: 0;
@@ -34,44 +31,46 @@ body {
     overflow-x: hidden;
 }
 
-/* HEADER LOGO */
+/* LOGO */
 .top-logo {
     margin-top: 30px;
     font-size: 48px;
     font-weight: 900;
     letter-spacing: 3px;
-    color: #fff;
     text-shadow: 0px 0px 40px rgba(108,92,231,0.8);
 }
 
-/* HERO TEXT */
+/* LANGUAGE BUTTON */
+.lang-switch {
+    margin-top: 10px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* HERO */
 .hero {
     margin-top: 10px;
     padding: 0 25px;
-    animation: fadeIn 1s ease-out;
 }
 
 .hero h1 {
     font-size: 44px;
     font-weight: 800;
     line-height: 1.1;
-    margin-bottom: 10px;
 }
 
 .hero p {
     font-size: 18px;
     color: var(--text-soft);
     margin-bottom: 35px;
-    line-height: 1.4;
 }
 
-/* ANIMACIÓN */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* BOTONES */
+/* BUTTONS */
 .btn {
     text-decoration: none;
     padding: 16px 32px;
@@ -82,7 +81,7 @@ body {
     border-radius: 14px;
     font-size: 18px;
     font-weight: 700;
-    transition: 0.25s transform, 0.25s background;
+    transition: 0.25s;
 }
 
 .btn-primary {
@@ -91,22 +90,13 @@ body {
     box-shadow: 0px 12px 28px rgba(108,92,231,0.5);
 }
 
-.btn-primary:hover {
-    transform: translateY(-4px);
-}
-
 .btn-secondary {
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.2);
     color: var(--text-main);
 }
 
-.btn-secondary:hover {
-    background: rgba(255,255,255,0.2);
-    transform: translateY(-4px);
-}
-
-/* SECCIÓN CATEGORÍAS */
+/* CATEGORIES */
 .section-title {
     margin-top: 60px;
     font-size: 20px;
@@ -128,109 +118,112 @@ body {
     border-radius: 16px;
     padding: 20px 10px;
     box-shadow: 0 10px 22px rgba(0,0,0,0.4);
-    text-align: center;
     backdrop-filter: blur(12px);
-    transition: 0.25s transform, 0.25s box-shadow;
 }
 
-.cat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 30px rgba(108,92,231,0.5);
-}
-
-.cat-icon {
-    font-size: 36px;
-    margin-bottom: 10px;
-}
-
-.cat-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-/* FOOTER */
 .footer {
     margin-top: 50px;
     font-size: 13px;
     color: #9ea2d8;
-    opacity: 0.7;
     padding-bottom: 30px;
 }
 </style>
-
 </head>
+
 <body>
 
 <div class="top-logo">FIXALL</div>
 
-<div class="hero">
-    <h1>Soluciones rápidas<br> para tu hogar</h1>
-    <p>
-        Electricistas, plomeros, mecánicos, limpieza, jardineros, pintura y más.<br>
-        <br>
-        FIXALL te conecta con trabajadores expertos cerca de ti, al instante.
-    </p>
+<button class="lang-switch" onclick="toggleLang()">Español</button>
 
-    <a class="btn btn-primary" href="login.html">Entrar</a>
-    <a class="btn btn-secondary" href="register.html">Crear Cuenta</a>
+<div class="hero">
+    <h1 id="t-title"></h1>
+    <p id="t-sub"></p>
+
+    <a class="btn btn-primary" id="t-login" href="login.html"></a>
+    <a class="btn btn-secondary" id="t-register" href="register.html"></a>
 </div>
 
-<div class="section-title">¿Qué podemos hacer por ti?</div>
+<div class="section-title" id="t-what"></div>
 
 <div class="categories">
-
-    <div class="cat-card">
-        <div class="cat-icon">⚡</div>
-        <div class="cat-name">Electricistas</div>
-    </div>
-
-    <div class="cat-card">
-        <div class="cat-icon">🔧</div>
-        <div class="cat-name">Plomería</div>
-    </div>
-
-    <div class="cat-card">
-        <div class="cat-icon">🧼</div>
-        <div class="cat-name">Limpieza</div>
-    </div>
-
-    <div class="cat-card">
-        <div class="cat-icon">🌱</div>
-        <div class="cat-name">Cortar Grama</div>
-    </div>
-
-    <div class="cat-card">
-        <div class="cat-icon">🎨</div>
-        <div class="cat-name">Pintura</div>
-    </div>
-
-    <div class="cat-card">
-        <div class="cat-icon">🔨</div>
-        <div class="cat-name">Carpintería</div>
-    </div>
-
-    <div class="cat-card">
-        <div class="cat-icon">🚗</div>
-        <div class="cat-name">Mecánica</div>
-    </div>
-
-    <div class="cat-card">
-        <div class="cat-icon">🏚️</div>
-        <div class="cat-name">Reparaciones</div>
-    </div>
-
+    <div class="cat-card"><div class="cat-icon">⚡</div><div id="cat1"></div></div>
+    <div class="cat-card"><div class="cat-icon">🔧</div><div id="cat2"></div></div>
+    <div class="cat-card"><div class="cat-icon">🧼</div><div id="cat3"></div></div>
+    <div class="cat-card"><div class="cat-icon">🌱</div><div id="cat4"></div></div>
+    <div class="cat-card"><div class="cat-icon">🎨</div><div id="cat5"></div></div>
+    <div class="cat-card"><div class="cat-icon">🔨</div><div id="cat6"></div></div>
+    <div class="cat-card"><div class="cat-icon">🚗</div><div id="cat7"></div></div>
+    <div class="cat-card"><div class="cat-icon">🏚️</div><div id="cat8"></div></div>
 </div>
 
-<div class="footer">© 2025 FIXALL - Servicios profesionales a domicilio</div>
+<div class="footer" id="t-footer"></div>
 
-<!-- REGISTRO DEL SERVICE WORKER -->
 <script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js")
-      .then(() => console.log("Service Worker registrado"))
-      .catch(err => console.error("Error SW:", err));
+const translations = {
+    en: {
+        title: "Fast solutions<br>for your home",
+        sub: "Electricians, plumbers, mechanics, cleaning, gardening, painting and more.<br><br>FIXALL connects you with trusted workers near you instantly.",
+        login: "Login",
+        register: "Create Account",
+        what: "What can we do for you?",
+        cat1: "Electricians",
+        cat2: "Plumbing",
+        cat3: "Cleaning",
+        cat4: "Lawn Cutting",
+        cat5: "Painting",
+        cat6: "Carpentry",
+        cat7: "Mechanics",
+        cat8: "Repairs",
+        footer: "© 2025 FIXALL - Professional home services"
+    },
+    es: {
+        title: "Soluciones rapidas<br>para tu hogar",
+        sub: "Electricistas, plomeros, mecanicos, limpieza, jardineros, pintura y mas.<br><br>FIXALL te conecta con trabajadores expertos cerca de ti al instante.",
+        login: "Entrar",
+        register: "Crear Cuenta",
+        what: "Que podemos hacer por ti?",
+        cat1: "Electricistas",
+        cat2: "Plomeria",
+        cat3: "Limpieza",
+        cat4: "Cortar Grama",
+        cat5: "Pintura",
+        cat6: "Carpinteria",
+        cat7: "Mecanica",
+        cat8: "Reparaciones",
+        footer: "© 2025 FIXALL - Servicios profesionales a domicilio"
+    }
+};
+
+let currentLang = "en";
+
+function applyLang() {
+    const t = translations[currentLang];
+    document.getElementById("t-title").innerHTML = t.title;
+    document.getElementById("t-sub").innerHTML = t.sub;
+    document.getElementById("t-login").innerText = t.login;
+    document.getElementById("t-register").innerText = t.register;
+    document.getElementById("t-what").innerText = t.what;
+    document.getElementById("cat1").innerText = t.cat1;
+    document.getElementById("cat2").innerText = t.cat2;
+    document.getElementById("cat3").innerText = t.cat3;
+    document.getElementById("cat4").innerText = t.cat4;
+    document.getElementById("cat5").innerText = t.cat5;
+    document.getElementById("cat6").innerText = t.cat6;
+    document.getElementById("cat7").innerText = t.cat7;
+    document.getElementById("cat8").innerText = t.cat8;
+    document.getElementById("t-footer").innerText = t.footer;
+
+    document.querySelector(".lang-switch").innerText =
+        currentLang === "en" ? "Espanol" : "English";
 }
+
+function toggleLang() {
+    currentLang = currentLang === "en" ? "es" : "en";
+    applyLang();
+}
+
+applyLang();
 </script>
 
 </body>

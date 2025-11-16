@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mi Perfil - Trabajador FIXALL</title>
+<title>My Profile - FIXALL Worker</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -169,14 +169,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // Cargar datos
+    // Load user data
     document.getElementById("fullName").textContent = u.full_name;
     document.getElementById("email").textContent = u.email;
     document.getElementById("phone").textContent = u.phone;
-    document.getElementById("exp").textContent = u.experience_years + " años";
-    document.getElementById("about").textContent = u.about || "Sin descripción";
+    document.getElementById("exp").textContent = u.experience_years + " years";
+    document.getElementById("about").textContent = u.about || "No description";
 
-    // Imagen
+    // Avatar image
     const img = document.getElementById("avatarImg");
     if (u.profile_image) {
         img.src = u.profile_image;
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 </head>
 <body>
 
-<div class="topbar">Mi Perfil</div>
+<div class="topbar">My Profile</div>
 
 <div class="profile-card">
     <div class="avatar">
@@ -198,32 +198,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     </div>
 
     <div class="upload-warning" id="uploadWarn">
-        ⚠ Debes subir una foto de perfil para recibir trabajos.
+        ⚠ You must upload a profile picture to receive jobs.
     </div>
 
-    <div class="name" id="fullName">Trabajador</div>
+    <div class="name" id="fullName">Worker</div>
 </div>
 
 <div class="box">
-    <div class="row"><b>Correo:</b> <span id="email"></span></div>
-    <div class="row"><b>Teléfono:</b> <span id="phone"></span></div>
-    <div class="row"><b>Años de experiencia:</b> <span id="exp"></span></div>
-    <div class="row"><b>Descripción:</b> <span id="about"></span></div>
+    <div class="row"><b>Email:</b> <span id="email"></span></div>
+    <div class="row"><b>Phone:</b> <span id="phone"></span></div>
+    <div class="row"><b>Years of experience:</b> <span id="exp"></span></div>
+    <div class="row"><b>About:</b> <span id="about"></span></div>
 </div>
 
-<a class="btn btn-edit" href="/worker/edit-profile.html">Editar Perfil</a>
-<a class="btn btn-logout" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">Cerrar sesión</a>
+<a class="btn btn-edit" href="/worker/edit-profile.html">Edit Profile</a>
+<a class="btn btn-logout" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">Log Out</a>
 
 <!-- NAVBAR -->
 <div class="bottom-nav">
     <a class="nav-btn" href="/worker/dashboard.html">
-        <span>📋</span> Trabajos
+        <span>📋</span> Jobs
     </a>
     <a class="nav-btn nav-active" href="/worker/profile.html">
-        <span>👤</span> Perfil
+        <span>👤</span> Profile
     </a>
     <a class="nav-btn" href="/login.html">
-        <span>🚪</span> Salir
+        <span>🚪</span> Logout
     </a>
 </div>
 
