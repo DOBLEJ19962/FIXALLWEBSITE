@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Registro - FIXALL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #6c5ce7;
+    --primary2: #9b59b6;
+    --bg1: #0f1020;
+    --bg2: #2f225f;
+    --text-main: #ffffff;
+    --text-soft: #d5d7f8;
+    --glass: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.18);
+}
+
+/* BODY full center */
+body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at top, var(--bg2) 0%, var(--bg1) 55%, #02010a 100%);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* FIX: WRAPPER so it stays centered ALWAYS */
+.wrapper {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+}
+
+/* CARD */
+.box {
+    width: 100%;
+    background: var(--glass);
+    padding: 32px;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+
+    color: var(--text-main);
+    box-shadow: 0 14px 35px rgba(0,0,0,0.55);
+    animation: fadeIn 0.7s ease-out;
+}
+
+/* LOGO FIXALL */
+.logo {
+    font-size: 42px;
+    text-align: center;
+    font-weight: 900;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+/* LABEL + INPUT */
+label {
+    display: block;
+    margin-top: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-soft);
+}
+
+input, select {
+    width: 100%;
+    padding: 14px;
+    margin-top: 6px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    font-size: 16px;
+    color: var(--text-main);
+    box-sizing: border-box;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(108,92,231,0.5);
+}
+
+input::placeholder {
+    color: #c7c9e8;
+}
+
+/* BUTTON */
+button {
+    margin-top: 25px;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color: white;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 12px 26px rgba(108,92,231,0.45);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script type="module" src="/js/auth.js"></script>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div class="box">
+        <div class="logo">FIXALL</div>
+        <h2>Crear Cuenta</h2>
+
+        <label>Nombre Completo</label>
+        <input id="name" type="text" placeholder="Juan Pérez">
+
+        <label>Correo Electrónico</label>
+        <input id="email" type="email" placeholder="correo@ejemplo.com">
+
+        <label>Contraseña</label>
+        <input id="password" type="password" placeholder="********">
+
+        <label>Número de Celular</label>
+        <input id="phone" type="tel" placeholder="305-555-1234">
+
+        <label>Calle y número</label>
+        <input id="street" type="text" placeholder="123 Main St">
+
+        <label>Ciudad</label>
+        <input id="city" type="text" placeholder="Cleveland">
+
+        <label>Estado</label>
+        <select id="state">
+            <option value="">Selecciona tu estado</option>
+            <option>Ohio</option>
+        </select>
+
+        <label>Código Postal (ZIP)</label>
+        <input id="zipcode" type="text" placeholder="Ej: 44101">
+
+        <label>Tipo de Cuenta</label>
+        <select id="role">
+            <option value="client">Cliente</option>
+            <option value="worker">Trabajador</option>
+        </select>
+
+        <button id="registerBtn">Registrarme</button>
+    </div>
+
+</div>
+
+</body>
+</html>

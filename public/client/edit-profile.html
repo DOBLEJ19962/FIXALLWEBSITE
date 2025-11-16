@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Editar Perfil - FIXALL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #6c5ce7;
+    --primary-dark: #4b36d1;
+    --bg: #0f1020;
+    --card-bg: rgba(255,255,255,0.06);
+    --input-bg: rgba(255,255,255,0.08);
+    --border-soft: rgba(255,255,255,0.12);
+    --text-main: #ffffff;
+    --text-soft: #bfc1d9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #2f225f 0, #050413 55%, #02010a 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-main);
+    padding-bottom: 70px;
+}
+
+/* TOP BAR */
+.topbar {
+    background: rgba(10,10,28,0.7);
+    backdrop-filter: blur(12px);
+    padding: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    position: sticky;
+    top: 0;
+}
+
+/* PROFILE CARD */
+.profile-box {
+    margin: 20px auto;
+    max-width: 430px;
+    padding: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+}
+
+/* LABELS */
+label {
+    display: block;
+    margin: 14px 0 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-soft);
+    letter-spacing: 0.03em;
+}
+
+/* INPUTS */
+input {
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    background: var(--input-bg);
+    color: var(--text-main);
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(108,92,231,0.5);
+}
+
+/* BUTTON SAVE */
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #6c5ce7, #9b59b6);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(108,92,231,0.6);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10,10,25,0.96);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-around;
+    padding: 6px 0 8px;
+}
+
+.nav-btn {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-soft);
+    text-decoration: none;
+}
+
+.nav-btn span {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+.nav-btn-active {
+    color: #a29bfe;
+    font-weight: 700;
+}
+</style>
+
+<script type="module">
+import { updateProfile } from "/js/auth.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const u = JSON.parse(localStorage.getItem("fixall_user"));
+  if (!u) {
+    location.href = "/login.html";
+    return;
+  }
+
+  const nameEl = document.getElementById("name");
+  const emailEl = document.getElementById("email");
+  const phoneEl = document.getElementById("phone");
+  const streetEl = document.getElementById("street");
+  const cityEl = document.getElementById("city");
+  const stateEl = document.getElementById("state");
+  const zipcodeEl = document.getElementById("zipcode");
+
+  // Load existing profile data
+  nameEl.value = u.full_name || "";
+  emailEl.value = u.email || "";
+  phoneEl.value = u.phone || "";
+  streetEl.value = u.street || "";
+  cityEl.value = u.city || "";
+  stateEl.value = u.state || "";
+  zipcodeEl.value = u.zipcode || "";
+
+  document.getElementById("saveBtn").addEventListener("click", async () => {
+    const updated = {
+      full_name: nameEl.value.trim(),
+      email: emailEl.value.trim(),
+      phone: phoneEl.value.trim(),
+      street: streetEl.value.trim(),
+      city: cityEl.value.trim(),
+      state: stateEl.value.trim(),
+      zipcode: zipcodeEl.value.trim()
+    };
+
+    const { error } = await updateProfile(updated, u.id);
+
+    if (error) {
+      alert("Error actualizando: " + error.message);
+    } else {
+      alert("Perfil actualizado correctamente");
+
+      // Update localStorage
+      const newUser = { ...u, ...updated };
+      localStorage.setItem("fixall_user", JSON.stringify(newUser));
+
+      location.href = "/client/profile.html";
+    }
+  });
+});
+</script>
+
+</head>
+<body>
+
+<div class="topbar">Editar Perfil</div>
+
+<div class="profile-box">
+
+  <label>Nombre completo</label>
+  <input id="name" type="text">
+
+  <label>Correo electrónico</label>
+  <input id="email" type="email">
+
+  <label>Teléfono</label>
+  <input id="phone" type="tel">
+
+  <label>Calle</label>
+  <input id="street" type="text">
+
+  <label>Ciudad</label>
+  <input id="city" type="text">
+
+  <label>Estado</label>
+  <input id="state" type="text">
+
+  <label>ZIP Code</label>
+  <input id="zipcode" type="text">
+
+  <button id="saveBtn">Guardar cambios</button>
+
+</div>
+
+<div class="bottom-nav">
+  <a class="nav-btn" href="/client/dashboard.html">
+    <span>🏠</span> Inicio
+  </a>
+  <a class="nav-btn nav-btn-active" href="/client/profile.html">
+    <span>👤</span> Perfil
+  </a>
+  <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
+    <span>🚪</span> Salir
+  </a>
+</div>
+
+</body>
+</html>

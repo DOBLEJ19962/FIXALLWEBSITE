@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Nuevo Trabajo - FIXALL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #6c5ce7;
+    --primary2: #9b59b6;
+    --bg1: #0f1020;
+    --bg2: #2f225f;
+    --text-main: #ffffff;
+    --text-soft: #d2d4f5;
+    --glass: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.15);
+}
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, var(--bg2) 0%, var(--bg1) 55%);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 90px;
+    min-height: 100vh;
+}
+
+/* TOP BAR */
+.topbar {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    background: rgba(20,20,40,0.85);
+    backdrop-filter: blur(14px);
+    padding: 22px;
+    font-size: 22px;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* CARD */
+.box {
+    width: 92%;
+    max-width: 460px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 25px 26px;
+    box-shadow: 0px 12px 32px rgba(0,0,0,0.45);
+    backdrop-filter: blur(16px);
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* TEXTS */
+label {
+    display: block;
+    margin-top: 16px;
+    font-weight: 600;
+    color: var(--text-soft);
+    font-size: 15px;
+}
+
+/* INPUTS */
+input, textarea, select {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.06);
+    color: var(--text-main);
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #c9cbec;
+}
+
+textarea {
+    resize: none;
+    min-height: 120px;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(108,92,231,0.6);
+}
+
+/* PAYMENT METHODS */
+.methods {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.methods label {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.methods input[type="checkbox"] {
+    width: auto;
+}
+
+/* ERROR TEXT */
+#errorPayments {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #ff5e5e;
+    display: none;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    margin-top: 25px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0px 12px 30px rgba(108,92,231,0.55);
+    transition: transform 0.2s;
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+.help {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-top: 4px;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(25px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script type="module">
+import { supabase } from "/js/supabase.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+    const u = JSON.parse(localStorage.getItem("fixall_user"));
+    if (!u || u.role !== "client") {
+        location.href = "/login.html";
+        return;
+    }
+
+    const sendBtn = document.getElementById("sendBtn");
+    const errorPayments = document.getElementById("errorPayments");
+
+    sendBtn.addEventListener("click", async () => {
+        const title = document.getElementById("title").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const category = document.getElementById("category").value;
+        const priceVal = document.getElementById("price").value;
+
+        const price = parseFloat(priceVal);
+        const methods = Array.from(
+            document.querySelectorAll('input[name="paymentMethod"]:checked')
+        ).map(i => i.value);
+
+        errorPayments.style.display = "none";
+
+        if (!title || !description || !category || !priceVal) {
+            alert("Completa todos los campos.");
+            return;
+        }
+
+        if (isNaN(price) || price <= 0) {
+            alert("Introduce un monto válido mayor que 0.");
+            return;
+        }
+
+        if (methods.length === 0) {
+            errorPayments.style.display = "block";
+            return;
+        }
+
+        const payment_methods = methods.join(", ");
+
+        const { data, error } = await supabase
+            .from("jobs")
+            .insert([{
+                client_id: u.id,
+                client_name: u.full_name,
+                title,
+                description,
+                category,
+                street: u.street,
+                city: u.city,
+                state: u.state,
+                zipcode: u.zipcode,
+                price,
+                payment_methods,
+                status: "pending"
+            }])
+            .select()
+            .single();
+
+        if (error) {
+            console.error(error);
+            alert("Error creando trabajo: " + error.message);
+            return;
+        }
+
+        alert("Tu trabajo fue enviado. Un trabajador FIXALL lo verá pronto.");
+        location.href = "/client/dashboard.html";
+    });
+});
+</script>
+
+</head>
+<body>
+
+<div class="topbar">Nuevo Trabajo</div>
+
+<div class="box">
+
+    <label>Título del trabajo</label>
+    <input id="title" type="text" placeholder="Ej: Revisar breaker eléctrico">
+
+    <label>Categoría</label>
+    <select id="category">
+        <option value="">Selecciona una categoría</option>
+        <option>Electricidad</option>
+        <option>Plomería</option>
+        <option>Pintura</option>
+        <option>Limpieza de casa</option>
+        <option>Limpieza profunda</option>
+        <option>Corte de césped</option>
+        <option>Jardinería</option>
+        <option>Reparación de techo</option>
+        <option>Mantenimiento de AC</option>
+        <option>Reparación de electrodomésticos</option>
+        <option>Mecánica (auto en casa)</option>
+        <option>Mudanza y carga</option>
+        <option>Instalación de TV</option>
+        <option>Montar muebles</option>
+        <option>Cerrajería</option>
+        <option>Handyman general</option>
+        <option>Lavado a presión</option>
+        <option>Limpieza de alfombras</option>
+        <option>Otro</option>
+    </select>
+
+    <label>Descripción</label>
+    <textarea id="description" placeholder="Explica bien qué hay que hacer, ubicación exacta, horarios disponibles, etc."></textarea>
+
+    <label>¿Cuánto pagarás? (USD)</label>
+    <input id="price" type="number" min="1" step="0.01" placeholder="Ej: 120">
+
+    <label>Métodos de pago aceptados</label>
+    <div class="methods">
+        <label><input type="checkbox" name="paymentMethod" value="Cash">Cash</label>
+        <label><input type="checkbox" name="paymentMethod" value="Zelle">Zelle</label>
+        <label><input type="checkbox" name="paymentMethod" value="CashApp">CashApp</label>
+    </div>
+
+    <div id="errorPayments">Selecciona al menos un método de pago.</div>
+
+    <p class="help">Esta información será visible para el trabajador al aceptar tu trabajo.</p>
+
+    <button id="sendBtn">Enviar Trabajo</button>
+
+</div>
+
+</body>
+</html>

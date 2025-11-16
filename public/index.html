@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>FIXALL - Servicios a Domicilio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+/* PALETA FIXALL */
+:root {
+    --primary: #6c5ce7;
+    --primary2: #9b59b6;
+    --bg1: #0f1020;
+    --bg2: #2f225f;
+    --text-main: #ffffff;
+    --text-soft: #d7daf9;
+}
+
+/* ESTILO GENERAL */
+body {
+    margin: 0;
+    padding: 0;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(circle at top, var(--bg2) 0%, var(--bg1) 55%, #02010a 100%);
+    color: var(--text-main);
+    text-align: center;
+    overflow-x: hidden;
+}
+
+/* HEADER LOGO */
+.top-logo {
+    margin-top: 30px;
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: #fff;
+    text-shadow: 0px 0px 40px rgba(108,92,231,0.8);
+}
+
+/* HERO TEXT */
+.hero {
+    margin-top: 10px;
+    padding: 0 25px;
+    animation: fadeIn 1s ease-out;
+}
+
+.hero h1 {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 18px;
+    color: var(--text-soft);
+    margin-bottom: 35px;
+    line-height: 1.4;
+}
+
+/* ANIMACIÓN */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* BOTONES */
+.btn {
+    text-decoration: none;
+    padding: 16px 32px;
+    width: 80%;
+    max-width: 330px;
+    display: block;
+    margin: 12px auto;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    transition: 0.25s transform, 0.25s background;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color: white;
+    box-shadow: 0px 12px 28px rgba(108,92,231,0.5);
+}
+
+.btn-primary:hover {
+    transform: translateY(-4px);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text-main);
+}
+
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-4px);
+}
+
+/* SECCIÓN CATEGORÍAS */
+.section-title {
+    margin-top: 60px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #cfd2ff;
+}
+
+.categories {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    padding: 0 20px 30px;
+}
+
+.cat-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px 10px;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.4);
+    text-align: center;
+    backdrop-filter: blur(12px);
+    transition: 0.25s transform, 0.25s box-shadow;
+}
+
+.cat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 30px rgba(108,92,231,0.5);
+}
+
+.cat-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.cat-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* FOOTER */
+.footer {
+    margin-top: 50px;
+    font-size: 13px;
+    color: #9ea2d8;
+    opacity: 0.7;
+    padding-bottom: 30px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="top-logo">FIXALL</div>
+
+<div class="hero">
+    <h1>Soluciones rápidas<br> para tu hogar</h1>
+    <p>
+        Electricistas, plomeros, mecánicos, limpieza, jardineros, pintura y más.<br>
+        <br>
+        FIXALL te conecta con trabajadores expertos cerca de ti, al instante.
+    </p>
+
+    <a class="btn btn-primary" href="login.html">Entrar</a>
+    <a class="btn btn-secondary" href="register.html">Crear Cuenta</a>
+</div>
+
+<div class="section-title">¿Qué podemos hacer por ti?</div>
+
+<div class="categories">
+
+    <div class="cat-card">
+        <div class="cat-icon">⚡</div>
+        <div class="cat-name">Electricistas</div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-icon">🔧</div>
+        <div class="cat-name">Plomería</div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-icon">🧼</div>
+        <div class="cat-name">Limpieza</div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-icon">🌱</div>
+        <div class="cat-name">Cortar Grama</div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-icon">🎨</div>
+        <div class="cat-name">Pintura</div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-icon">🔨</div>
+        <div class="cat-name">Carpintería</div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-icon">🚗</div>
+        <div class="cat-name">Mecánica</div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-icon">🏚️</div>
+        <div class="cat-name">Reparaciones</div>
+    </div>
+
+</div>
+
+<div class="footer">© 2025 FIXALL - Servicios profesionales a domicilio</div>
+
+</body>
+</html>

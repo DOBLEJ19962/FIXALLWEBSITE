@@ -1,0 +1,536 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>FIXALL - Panel Trabajador</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #6c5ce7;
+    --primary-dark: #5643d0;
+    --bg: #050412;
+    --card-bg: rgba(14,13,30,0.96);
+    --card-border: rgba(130,120,255,0.35);
+    --text-main: #ffffff;
+    --text-soft: #c7c9e6;
+    --green: #00d98b;
+    --red: #ff7675;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #32215f 0, #02010b 55%, #000 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-main);
+    padding-bottom: 72px;
+}
+
+/* HEADER / BRAND */
+.header {
+    padding: 18px 18px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.brand-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: radial-gradient(circle at 30% 20%, #a29bfe, #6c5ce7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    font-weight:900;
+    box-shadow:0 6px 16px rgba(108,92,231,0.8);
+}
+.brand-txt {
+    display:flex;
+    flex-direction:column;
+}
+.brand-txt .t1 {
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:0.08em;
+}
+.brand-txt .t2 {
+    font-size:11px;
+    color:var(--text-soft);
+}
+.worker-chip {
+    font-size:11px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.12);
+}
+
+/* TABS NAV */
+.tabs {
+    margin: 0 18px 10px;
+    background: rgba(10,10,28,0.95);
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    padding: 4px;
+}
+.tab-btn {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 999px;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--text-soft);
+}
+.tab-btn-active {
+    background: linear-gradient(135deg, #6c5ce7, #9b59b6);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 6px 14px rgba(108,92,231,0.7);
+}
+
+/* SECTION TITLE */
+.section-title {
+    margin: 6px 18px 4px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    color: rgba(199,201,230,0.85);
+}
+
+/* JOB CARD */
+.job-card {
+    margin: 8px 18px;
+    padding: 14px 14px 12px;
+    border-radius: 18px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.7);
+}
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.job-title-block {
+    display: flex;
+    flex-direction: column;
+}
+.job-title {
+    font-size: 15px;
+    font-weight: 700;
+}
+.job-client {
+    font-size: 11px;
+    color: var(--text-soft);
+}
+.job-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--green);
+}
+.job-body {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-soft);
+}
+.job-row {
+    margin-top: 4px;
+}
+.job-row b {
+    color: #f5f6fa;
+}
+.job-footer {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.action-btn-main {
+    width: 100%;
+    background: linear-gradient(135deg, #6c5ce7, #9b59b6);
+    border-radius: 999px;
+    border: none;
+    padding: 9px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+}
+.action-btn-secondary {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 8px 0;
+    font-size: 12px;
+    color: var(--text-soft);
+    cursor: pointer;
+}
+
+/* STATUS PILL */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #fff;
+}
+.s-pending   { background:rgba(99,110,114,0.4); color:#dfe6e9; }
+.s-accepted  { background:rgba(108,92,231,0.4); color:#dfe6ff; }
+.s-on_the_way{ background:rgba(253,203,110,0.4); color:#ffeaa7; }
+.s-working   { background:rgba(232,67,147,0.4); color:#ffb6e3; }
+.s-complete  { background:rgba(0,184,148,0.4); color:#a3ffdf; }
+.s-cancelled { background:rgba(214,48,49,0.4); color:#ffb3b3; }
+
+/* EMPTY */
+.empty-message {
+    margin: 40px 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-soft);
+}
+
+/* NAV INFERIOR */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(8,8,24,0.96);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    justify-content: space-around;
+    padding: 6px 0 8px;
+}
+.nav-btn {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-soft);
+    text-decoration: none;
+}
+.nav-btn span {
+    display:block;
+    font-size:20px;
+    margin-bottom:2px;
+}
+.nav-btn-active {
+    color: #a29bfe;
+    font-weight: 700;
+}
+</style>
+
+<script type="module">
+import { supabase } from "/js/supabase.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const w = JSON.parse(localStorage.getItem("fixall_user"));
+    if (!w || w.role !== "worker") {
+        location.href = "/login.html";
+        return;
+    }
+
+    // Mostrar algo de info en chip
+    document.getElementById("workerNameChip").textContent = w.full_name || "Trabajador FIXALL";
+
+    const availableList = document.getElementById("availableJobs");
+    const myJobsList = document.getElementById("myJobs");
+
+    const tabAvailable = document.getElementById("tabAvailable");
+    const tabMyJobs = document.getElementById("tabMyJobs");
+
+    function statusPill(status) {
+        let cls = "s-pending";
+        if (status === "accepted") cls = "s-accepted";
+        if (status === "on_the_way") cls = "s-on_the_way";
+        if (status === "working") cls = "s-working";
+        if (status === "complete") cls = "s-complete";
+        if (status === "cancelled") cls = "s-cancelled";
+        return `<span class="status-pill ${cls}"><span class="status-dot"></span>${status}</span>`;
+    }
+
+    function mapsLink(job) {
+        const q = encodeURIComponent(`${job.street}, ${job.city}, ${job.state} ${job.zipcode}`);
+        return `https://www.google.com/maps/search/?api=1&query=${q}`;
+    }
+
+    async function loadAvailable() {
+        const { data: jobs, error } = await supabase
+            .from("jobs")
+            .select("*")
+            .is("worker_id", null)
+            .eq("status", "pending")
+            .order("created_at", { ascending: true });
+
+        availableList.innerHTML = "";
+
+        if (error) {
+            console.error(error);
+            availableList.innerHTML = `<div class="empty-message">Error cargando trabajos disponibles.</div>`;
+            return;
+        }
+
+        if (!jobs || jobs.length === 0) {
+            availableList.innerHTML = `<div class="empty-message">No hay trabajos disponibles por ahora. Revisa en unos minutos.</div>`;
+            return;
+        }
+
+        jobs.forEach(job => {
+            const div = document.createElement("div");
+            div.className = "job-card";
+
+            const price = job.price && job.price.toFixed ? job.price.toFixed(2) : (job.price || "0.00");
+
+            div.innerHTML = `
+                <div class="job-header">
+                    <div class="job-title-block">
+                        <div class="job-title">${job.title}</div>
+                        <div class="job-client">Cliente: ${job.client_name}</div>
+                    </div>
+                    <div class="job-price">$${price}</div>
+                </div>
+                <div class="job-body">
+                    <div class="job-row"><b>Categoría:</b> ${job.category || "Servicio"}</div>
+                    <div class="job-row"><b>Dirección:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
+                    <div class="job-row"><b>Pago:</b> ${job.payment_methods || "No especificado"}</div>
+                    <div class="job-row"><b>Detalles:</b> ${job.description || ""}</div>
+                    ${statusPill(job.status)}
+                </div>
+                <div class="job-footer">
+                    <button class="action-btn-main">Aceptar trabajo</button>
+                    <button class="action-btn-secondary">Ver en Maps</button>
+                </div>
+            `;
+
+            div.querySelector(".action-btn-main").addEventListener("click", async () => {
+                const { error: errUpdate } = await supabase
+                    .from("jobs")
+                    .update({
+                        worker_id: w.id,
+                        worker_name: w.full_name,
+                        worker_phone: w.phone,
+                        status: "accepted"
+                    })
+                    .eq("id", job.id)
+                    .is("worker_id", null);
+
+                if (errUpdate) {
+                    console.error(errUpdate);
+                    alert("Otro trabajador ya aceptó este trabajo.");
+                    return;
+                }
+
+                alert("Trabajo aceptado.");
+                await loadAll();
+            });
+
+            div.querySelector(".action-btn-secondary").addEventListener("click", () => {
+                window.open(mapsLink(job), "_blank");
+            });
+
+            availableList.appendChild(div);
+        });
+    }
+
+    async function updateStatus(jobId, newStatus) {
+        const { error } = await supabase
+            .from("jobs")
+            .update({ status: newStatus })
+            .eq("id", jobId)
+            .eq("worker_id", w.id);
+
+        if (error) {
+            console.error(error);
+            alert("Error actualizando estado: " + error.message);
+            return;
+        }
+
+        await loadAll();
+    }
+
+    async function loadMyJobs() {
+        const { data: jobs, error } = await supabase
+            .from("jobs")
+            .select("*")
+            .eq("worker_id", w.id)
+            .order("created_at", { ascending: false });
+
+        myJobsList.innerHTML = "";
+
+        if (error) {
+            console.error(error);
+            myJobsList.innerHTML = `<div class="empty-message">Error cargando tus trabajos.</div>`;
+            return;
+        }
+
+        if (!jobs || jobs.length === 0) {
+            myJobsList.innerHTML = `<div class="empty-message">Todavía no tienes trabajos asignados.</div>`;
+            return;
+        }
+
+        jobs.forEach(job => {
+            const div = document.createElement("div");
+            div.className = "job-card";
+
+            const price = job.price && job.price.toFixed ? job.price.toFixed(2) : (job.price || "0.00");
+
+            div.innerHTML = `
+                <div class="job-header">
+                    <div class="job-title-block">
+                        <div class="job-title">${job.title}</div>
+                        <div class="job-client">Cliente: ${job.client_name}</div>
+                    </div>
+                    <div class="job-price">$${price}</div>
+                </div>
+                <div class="job-body">
+                    <div class="job-row"><b>Categoría:</b> ${job.category || "Servicio"}</div>
+                    <div class="job-row"><b>Dirección:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
+                    <div class="job-row"><b>Pago:</b> ${job.payment_methods || "No especificado"}</div>
+                    <div class="job-row"><b>Detalles:</b> ${job.description || ""}</div>
+                    ${statusPill(job.status)}
+                </div>
+                <div class="job-footer" id="actions-${job.id}">
+                    <button class="action-btn-secondary">Ver en Maps</button>
+                </div>
+            `;
+
+            div.querySelector(".action-btn-secondary").addEventListener("click", () => {
+                window.open(mapsLink(job), "_blank");
+            });
+
+            const actionsDiv = div.querySelector(`#actions-${job.id}`);
+
+            if (job.status === "accepted") {
+                const btn = document.createElement("button");
+                btn.className = "action-btn-main";
+                btn.textContent = "Marcar: En camino";
+                btn.addEventListener("click", async () => {
+                    await updateStatus(job.id, "on_the_way");
+                });
+                actionsDiv.appendChild(btn);
+            } else if (job.status === "on_the_way") {
+                const btn = document.createElement("button");
+                btn.className = "action-btn-main";
+                btn.textContent = "Marcar: Trabajando";
+                btn.addEventListener("click", async () => {
+                    await updateStatus(job.id, "working");
+                });
+                actionsDiv.appendChild(btn);
+            } else if (job.status === "working") {
+                const btn = document.createElement("button");
+                btn.className = "action-btn-main";
+                btn.textContent = "Marcar: Completado";
+                btn.addEventListener("click", async () => {
+                    await updateStatus(job.id, "complete");
+                });
+                actionsDiv.appendChild(btn);
+            } else if (job.status === "complete") {
+                const done = document.createElement("div");
+                done.className = "job-row";
+                done.style.marginTop = "6px";
+                done.style.color = "#00d98b";
+                done.style.fontWeight = "700";
+                done.textContent = "✅ Trabajo completado";
+                actionsDiv.appendChild(done);
+            } else if (job.status === "cancelled") {
+                const cancelled = document.createElement("div");
+                cancelled.className = "job-row";
+                cancelled.style.marginTop = "6px";
+                cancelled.style.color = "#ff7675";
+                cancelled.style.fontWeight = "700";
+                cancelled.textContent = "❌ Trabajo cancelado por el cliente";
+                actionsDiv.appendChild(cancelled);
+            }
+
+            myJobsList.appendChild(div);
+        });
+    }
+
+    async function loadAll() {
+        await loadAvailable();
+        await loadMyJobs();
+    }
+
+    // Tabs behavior
+    function showAvailable() {
+        tabAvailable.classList.add("tab-btn-active");
+        tabMyJobs.classList.remove("tab-btn-active");
+        availableList.style.display = "block";
+        myJobsList.style.display = "none";
+    }
+    function showMyJobs() {
+        tabMyJobs.classList.add("tab-btn-active");
+        tabAvailable.classList.remove("tab-btn-active");
+        availableList.style.display = "none";
+        myJobsList.style.display = "block";
+    }
+
+    tabAvailable.addEventListener("click", showAvailable);
+    tabMyJobs.addEventListener("click", showMyJobs);
+
+    await loadAll();
+    showAvailable();
+});
+</script>
+
+</head>
+<body>
+
+<div class="header">
+    <div class="brand">
+        <div class="brand-logo">F</div>
+        <div class="brand-txt">
+            <div class="t1">FIXALL</div>
+            <div class="t2">Panel del trabajador</div>
+        </div>
+    </div>
+    <div class="worker-chip" id="workerNameChip">Trabajador</div>
+</div>
+
+<div class="tabs">
+    <div id="tabAvailable" class="tab-btn tab-btn-active">Disponibles</div>
+    <div id="tabMyJobs" class="tab-btn">Mis trabajos</div>
+</div>
+
+<div class="section-title">Trabajos disponibles</div>
+<div id="availableJobs"></div>
+
+<div class="section-title">Mis trabajos asignados</div>
+<div id="myJobs" style="display:none;"></div>
+
+<div class="bottom-nav">
+    <a class="nav-btn nav-btn-active" href="/worker/dashboard.html">
+        <span>🛠️</span>
+        Trabajos
+    </a>
+    <a class="nav-btn" href="/worker/profile.html">
+        <span>👤</span>
+        Perfil
+    </a>
+    <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
+        <span>🚪</span>
+        Salir
+    </a>
+</div>
+
+</body>
+</html>

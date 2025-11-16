@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mi Perfil - FIXALL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #6c5ce7;
+    --primary2: #9b59b6;
+    --bg1: #0f1020;
+    --bg2: #2f225f;
+    --text-main: #ffffff;
+    --text-soft: #ced0f0;
+    --card-bg: rgba(255,255,255,0.06);
+    --border-soft: rgba(255,255,255,0.12);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(circle at top, var(--bg2) 0%, var(--bg1) 55%, #02010a 100%);
+    color: var(--text-main);
+    padding-bottom: 70px;
+}
+
+/* TOPBAR */
+.topbar {
+    background: rgba(10,10,28,0.7);
+    backdrop-filter: blur(14px);
+    text-align:center;
+    padding:18px 0;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:0.03em;
+    position: sticky;
+    top:0;
+}
+
+/* PROFILE CARD */
+.profile-card {
+    margin: 24px auto 14px;
+    max-width: 440px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px 20px;
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    margin: 0 auto;
+    font-size: 48px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow: 0px 10px 30px rgba(108,92,231,0.55);
+}
+
+.user-name {
+    margin-top: 16px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #dedfff;
+}
+
+/* INFO CARD */
+.info-card {
+    margin: 14px auto;
+    max-width: 440px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0px 8px 22px rgba(0,0,0,0.45);
+}
+
+.row {
+    margin: 10px 0;
+    font-size: 15px;
+}
+.row b {
+    color:#fff;
+}
+
+/* BUTTONS */
+.btn {
+    display:block;
+    width:90%;
+    max-width: 430px;
+    margin:14px auto;
+    padding:15px;
+    text-align:center;
+    font-size:16px;
+    font-weight:700;
+    border-radius:14px;
+    text-decoration:none;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color:white;
+    box-shadow:0 10px 26px rgba(108,92,231,0.5);
+}
+
+.btn-logout {
+    background:rgba(255,85,85,0.15);
+    border:1px solid rgba(255,100,100,0.4);
+    color:#ff6b6b;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:rgba(10,10,28,0.96);
+    backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,0.06);
+    display:flex;
+    justify-content:space-around;
+    padding:6px 0 8px;
+}
+
+.nav-btn {
+    text-align:center;
+    font-size:11px;
+    color:var(--text-soft);
+    text-decoration:none;
+}
+
+.nav-btn span {
+    display:block;
+    font-size:20px;
+    margin-bottom:2px;
+}
+
+.nav-btn-active {
+    color:#a29bfe;
+    font-weight:700;
+}
+</style>
+
+<script type="module">
+document.addEventListener("DOMContentLoaded", () => {
+
+  const u = JSON.parse(localStorage.getItem("fixall_user"));
+  if (!u) {
+    location.href = "/login.html";
+    return;
+  }
+
+  document.getElementById("avatar").textContent = u.full_name?.charAt(0)?.toUpperCase() || "U";
+  document.getElementById("fullName").textContent = u.full_name;
+  document.getElementById("email").textContent = u.email;
+  document.getElementById("phone").textContent = u.phone;
+  document.getElementById("street").textContent = u.street;
+  document.getElementById("city").textContent = u.city;
+  document.getElementById("stateTxt").textContent = u.state;
+  document.getElementById("zipcode").textContent = u.zipcode;
+
+});
+</script>
+
+</head>
+<body>
+
+<div class="topbar">Mi Perfil</div>
+
+<div class="profile-card">
+  <div class="avatar" id="avatar">U</div>
+  <div class="user-name" id="fullName">Usuario</div>
+</div>
+
+<div class="info-card">
+  <div class="row"><b>Email:</b> <span id="email"></span></div>
+  <div class="row"><b>Teléfono:</b> <span id="phone"></span></div>
+  <div class="row"><b>Calle:</b> <span id="street"></span></div>
+  <div class="row"><b>Ciudad:</b> <span id="city"></span></div>
+  <div class="row"><b>Estado:</b> <span id="stateTxt"></span></div>
+  <div class="row"><b>ZIP Code:</b> <span id="zipcode"></span></div>
+</div>
+
+<a class="btn btn-edit" href="/client/edit-profile.html">Editar Perfil</a>
+<a class="btn btn-logout" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
+  Cerrar sesión
+</a>
+
+<!-- NAV BAR -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="/client/dashboard.html">
+    <span>🏠</span> Inicio
+  </a>
+  <a class="nav-btn nav-btn-active" href="/client/profile.html">
+    <span>👤</span> Perfil
+  </a>
+  <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
+    <span>🚪</span> Salir
+  </a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,539 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>FIXALL - Panel del Cliente</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --primary: #6c5ce7;
+    --primary-dark: #5b4ad4;
+    --bg: #0f1020;
+    --card-bg: #181a2a;
+    --card-soft: rgba(255,255,255,0.04);
+    --text-main: #ffffff;
+    --text-soft: #c7c9e6;
+    --accent-green: #00d98b;
+    --accent-red: #ff7675;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #2f225f 0, #050413 55%, #02010a 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-main);
+    padding-bottom: 70px; /* espacio para nav inferior */
+}
+
+/* HEADER TOP BRAND */
+.header {
+    padding: 18px 18px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    background: radial-gradient(circle at 30% 20%, #a29bfe, #6c5ce7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 20px;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(108,92,231,0.7);
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-text .title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+.brand-text .subtitle {
+    font-size: 12px;
+    color: var(--text-soft);
+}
+
+.support-chip {
+    font-size: 11px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 999px;
+    padding: 6px 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+.support-chip span:first-child {
+    font-size: 10px;
+    color: var(--text-soft);
+}
+.support-chip a {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* SALUDO / RESUMEN */
+.hero-card {
+    margin: 0 18px 10px;
+    padding: 16px 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(108,92,231,0.95), rgba(155,89,182,0.95));
+    box-shadow: 0 14px 30px rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hero-left {
+    max-width: 70%;
+}
+
+.hero-greet {
+    font-size: 15px;
+    opacity: 0.9;
+}
+.hero-name {
+    font-size: 20px;
+    font-weight: 800;
+}
+.hero-small {
+    font-size: 12px;
+    margin-top: 4px;
+    opacity: 0.85;
+}
+.hero-stats {
+    font-size: 11px;
+    margin-top: 8px;
+    display: flex;
+    gap: 10px;
+}
+.hero-stat-pill {
+    background: rgba(0,0,0,0.2);
+    padding: 5px 8px;
+    border-radius: 999px;
+}
+
+.hero-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.18);
+    border: 2px solid rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 20px;
+}
+
+/* BOTÓN NUEVO TRABAJO */
+.new-job-btn {
+    margin: 14px 18px 4px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(144, 120, 255, 0.5);
+    color: var(--text-main);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.new-job-btn-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.new-job-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 20%, #a29bfe, #6c5ce7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+.new-job-main {
+    font-size: 15px;
+    font-weight: 600;
+}
+.new-job-sub {
+    font-size: 11px;
+    color: var(--text-soft);
+}
+.new-job-chevron {
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+/* SECCIÓN LISTA TRABAJOS */
+.section-title {
+    margin: 14px 18px 4px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(199,201,230,0.9);
+}
+
+/* CARD JOB */
+.job-card {
+    margin: 8px 18px;
+    padding: 14px 14px 12px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(24,24,48,0.9), rgba(14,14,32,0.9));
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.6);
+}
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.job-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.job-title {
+    font-size: 15px;
+    font-weight: 700;
+}
+.job-category {
+    font-size: 11px;
+    color: var(--text-soft);
+}
+.job-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent-green);
+}
+
+/* STATUS PILL */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #fff;
+}
+.s-pending           { background: rgba(99,110,114,0.3); color:#dfe6e9; }
+.s-accepted          { background: rgba(108,92,231,0.35); color:#dfe6ff; }
+.s-on_the_way        { background: rgba(253,203,110,0.35); color:#ffeaa7; }
+.s-working           { background: rgba(232,67,147,0.35); color:#ffb6e3; }
+.s-complete          { background: rgba(0,184,148,0.35); color:#a3ffdf; }
+.s-cancelled         { background: rgba(214,48,49,0.35); color:#ffb3b3; }
+
+/* BODY JOB */
+.job-body {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-soft);
+}
+.job-row {
+    margin-top: 4px;
+}
+.job-row b {
+    color: #f5f6fa;
+}
+.job-address {
+    margin-top: 4px;
+}
+
+/* CONTACTO / ACTIONS */
+.job-footer {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.worker-card {
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgba(126, 116, 255, 0.07);
+    border: 1px solid rgba(126, 116, 255, 0.3);
+    font-size: 11px;
+}
+.worker-card a {
+    color: #81ecec;
+    text-decoration: none;
+}
+
+/* Botón cancelar */
+.btn-cancel {
+    margin-top: 6px;
+    border: 1px solid rgba(255,118,117,0.6);
+    background: rgba(255,118,117,0.08);
+    color: var(--accent-red);
+    border-radius: 999px;
+    padding: 7px 10px;
+    font-size: 11px;
+    text-align: center;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Mensaje vacío */
+.empty-message {
+    margin: 40px 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-soft);
+}
+
+/* NAV INFERIOR */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10,10,25,0.96);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-around;
+    padding: 6px 0 8px;
+}
+.nav-btn {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-soft);
+    text-decoration: none;
+}
+.nav-btn span {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+.nav-btn-active {
+    color: #a29bfe;
+    font-weight: 700;
+}
+</style>
+
+<script type="module">
+import { supabase } from "/js/supabase.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const u = JSON.parse(localStorage.getItem("fixall_user"));
+    if (!u || u.role !== "client") {
+        location.href = "/login.html";
+        return;
+    }
+
+    // Saludo y avatar
+    const initials = u.full_name ? u.full_name.trim().charAt(0).toUpperCase() : "F";
+    document.getElementById("heroName").textContent = u.full_name || "Cliente FIXALL";
+    document.getElementById("heroAvatar").textContent = initials;
+
+    const jobsList = document.getElementById("jobsList");
+
+    async function loadJobs() {
+        const { data: jobs, error } = await supabase
+            .from("jobs")
+            .select("*")
+            .eq("client_id", u.id)
+            .order("created_at", { ascending: false });
+
+        jobsList.innerHTML = "";
+
+        if (error) {
+            console.error(error);
+            jobsList.innerHTML = `<div class="empty-message">Error cargando tus trabajos.</div>`;
+            return;
+        }
+
+        // stats
+        let activeCount = 0;
+        if (jobs && jobs.length > 0) {
+            activeCount = jobs.filter(j => ["pending","accepted","on_the_way","working"].includes(j.status)).length;
+        }
+        document.getElementById("heroActive").textContent = `${activeCount} activo(s)`;
+
+        if (!jobs || jobs.length === 0) {
+            jobsList.innerHTML = `<div class="empty-message">Aún no has creado trabajos. Crea tu primera orden con el botón de arriba.</div>`;
+            return;
+        }
+
+        jobs.forEach(job => {
+            const div = document.createElement("div");
+            div.className = "job-card";
+
+            let statusClass = "s-pending";
+            if (job.status === "accepted") statusClass = "s-accepted";
+            if (job.status === "on_the_way") statusClass = "s-on_the_way";
+            if (job.status === "working") statusClass = "s-working";
+            if (job.status === "complete") statusClass = "s-complete";
+            if (job.status === "cancelled") statusClass = "s-cancelled";
+
+            const created = job.created_at ? new Date(job.created_at).toLocaleString() : "";
+            const price = job.price && job.price.toFixed ? job.price.toFixed(2) : (job.price || "0.00");
+
+            div.innerHTML = `
+                <div class="job-header">
+                    <div class="job-title-block">
+                        <div class="job-title">${job.title}</div>
+                        <div class="job-category">${job.category || "Servicio"}</div>
+                    </div>
+                    <div class="job-price">$${price}</div>
+                </div>
+
+                <div class="job-body">
+                    <div class="job-row job-address">
+                        <b>Dirección:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}
+                    </div>
+                    <div class="job-row">
+                        <b>Métodos de pago:</b> ${job.payment_methods || "No especificado"}
+                    </div>
+                    <div class="job-row">
+                        <b>Fecha:</b> ${created}
+                    </div>
+                    <div class="job-row">
+                        <b>Detalles:</b> ${job.description || ""}
+                    </div>
+                    <div class="status-pill ${statusClass}">
+                        <span class="status-dot"></span> ${job.status}
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <div class="worker-card">
+                        ${
+                            job.worker_name
+                            ? `<b>Trabajador asignado:</b> ${job.worker_name}<br>
+                               <b>Teléfono:</b> ${
+                                    job.worker_phone
+                                    ? `<a href="tel:${job.worker_phone}">${job.worker_phone}</a>`
+                                    : "No disponible"
+                               }`
+                            : "Aún no hay trabajador asignado a este trabajo."
+                        }
+                    </div>
+                </div>
+            `;
+
+            // Botón cancelar si procede
+            if (["pending","accepted","on_the_way"].includes(job.status)) {
+                const btn = document.createElement("div");
+                btn.className = "btn-cancel";
+                btn.textContent = "Cancelar este trabajo";
+                btn.addEventListener("click", async () => {
+                    if (!confirm("¿Seguro que quieres cancelar este trabajo?")) return;
+
+                    const { error: errCancel } = await supabase
+                        .from("jobs")
+                        .update({ status: "cancelled" })
+                        .eq("id", job.id)
+                        .eq("client_id", u.id);
+
+                    if (errCancel) {
+                        console.error(errCancel);
+                        alert("No se pudo cancelar: " + errCancel.message);
+                        return;
+                    }
+                    alert("Trabajo cancelado.");
+                    await loadJobs();
+                });
+                div.querySelector(".job-footer").appendChild(btn);
+            }
+
+            jobsList.appendChild(div);
+        });
+    }
+
+    await loadJobs();
+});
+</script>
+
+</head>
+<body>
+
+<!-- HEADER / BRAND / SOPORTE -->
+<div class="header">
+    <div class="brand">
+        <div class="brand-logo">F</div>
+        <div class="brand-text">
+            <div class="title">FIXALL</div>
+            <div class="subtitle">Servicios a domicilio on-demand</div>
+        </div>
+    </div>
+    <div class="support-chip">
+        <span>Soporte 24/7</span>
+        <a href="tel:+18338345028">833-834-5028</a>
+    </div>
+</div>
+
+<!-- HERO USER / RESUMEN -->
+<div class="hero-card">
+    <div class="hero-left">
+        <div class="hero-greet">Hola,</div>
+        <div class="hero-name" id="heroName">Cliente FIXALL</div>
+        <div class="hero-small">Aquí puedes ver y controlar todos tus trabajos.</div>
+        <div class="hero-stats">
+            <div class="hero-stat-pill" id="heroActive">0 activo(s)</div>
+            <div class="hero-stat-pill">Pagos en efectivo y apps</div>
+        </div>
+    </div>
+    <div class="hero-avatar" id="heroAvatar">F</div>
+</div>
+
+<!-- BOTÓN NUEVO TRABAJO -->
+<a class="new-job-btn" href="/client/new-job.html">
+    <div class="new-job-btn-left">
+        <div class="new-job-icon">+</div>
+        <div>
+            <div class="new-job-main">Crear nueva solicitud</div>
+            <div class="new-job-sub">Electricista, plomería, limpieza, jardinería y más</div>
+        </div>
+    </div>
+    <div class="new-job-chevron">›</div>
+</a>
+
+<div class="section-title">Mis trabajos</div>
+<div id="jobsList"></div>
+
+<!-- NAV INFERIOR -->
+<div class="bottom-nav">
+    <a class="nav-btn nav-btn-active" href="/client/dashboard.html">
+        <span>🏠</span>
+        Inicio
+    </a>
+    <a class="nav-btn" href="/client/profile.html">
+        <span>👤</span>
+        Perfil
+    </a>
+    <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
+        <span>🚪</span>
+        Salir
+    </a>
+</div>
+
+</body>
+</html>
