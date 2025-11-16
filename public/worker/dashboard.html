@@ -409,12 +409,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dialogDanger = document.getElementById("dialogDanger");
     const dialogGhost = document.getElementById("dialogGhost");
 
-    let activeJobCache = null; // para usar en la confirmación de offline
+    let activeJobCache = null;
 
     /* ---------------------------
-       WORKER ONLINE / OFFLINE
-       Table: worker_status
-       Columns: id, worker_id, is_online, last_online
+       WORKER STATUS
     ----------------------------*/
 
     async function getWorkerStatus() {
@@ -424,56 +422,44 @@ document.addEventListener("DOMContentLoaded", async () => {
             .eq("worker_id", w.id)
             .maybeSingle();
 
-        if (error) {
-            console.error("Error getWorkerStatus:", error);
-            return null;
-        }
+        if (error) return null;
         return data;
     }
 
     async function ensureWorkerStatusRow() {
         const row = await getWorkerStatus();
         if (!row) {
-            const { error } = await supabase
-                .from("worker_status")
-                .insert({
-                    worker_id: w.id,
-                    is_online: false,
-                    last_online: new Date().toISOString()
-                });
-            if (error) console.error("Error inserting worker_status:", error);
+            await supabase.from("worker_status").insert({
+                worker_id: w.id,
+                is_online: false,
+                last_online: new Date().toISOString()
+            });
         }
     }
 
     async function setWorkerOnlineState(isOnline) {
-        const { error } = await supabase
+        await supabase
             .from("worker_status")
             .update({
                 is_online: isOnline,
                 last_online: new Date().toISOString()
             })
             .eq("worker_id", w.id);
-
-        if (error) console.error("Error updating worker_status:", error);
     }
 
     /* ---------------------------
-       ACTIVE JOB (accepted/on_the_way/arrived/working)
+       ACTIVE JOB
     ----------------------------*/
     async function getActiveJob() {
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from("jobs")
             .select("*")
             .eq("worker_id", w.id)
-            .in("status", ["accepted", "on_the_way", "arrived", "working"])
+            .in("status", ["accepted","on_the_way","arrived","working"])
             .order("created_at", { ascending: false })
             .limit(1)
             .maybeSingle();
 
-        if (error) {
-            console.error("Error getActiveJob:", error);
-            return null;
-        }
         return data;
     }
 
@@ -497,33 +483,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     /* ---------------------------
-       OVERLAY UI UPDATE
+       UPDATE OVERLAY
     ----------------------------*/
     async function updateOverlayAndFab() {
         await ensureWorkerStatusRow();
         const statusRow = await getWorkerStatus();
-        const isOnline = statusRow && statusRow.is_online;
-
-        // Count available jobs (last 5 minutes)
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-        const { data: jobs, error } = await supabase
-            .from("jobs")
-            .select("id")
-            .is("worker_id", null)
-            .eq("status", "pending")
-            .gte("created_at", fiveMinutesAgo);
-
-        let count = 0;
-        if (!error && jobs) count = jobs.length;
-
-        const jobsText =
-            count === 0
-            ? "No new jobs available in the last 5 minutes."
-            : (count === 1
-                ? "There is 1 new job available in the last 5 minutes."
-                : `There are ${count} new jobs available in the last 5 minutes.`);
-
-        overlayJobsText.textContent = jobsText;
+        const isOnline = statusRow?.is_online;
 
         if (isOnline) {
             overlayStatusText.textContent = "You are currently ONLINE";
@@ -537,26 +502,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     /* ---------------------------
-       LOAD AVAILABLE JOBS
-       - Only if worker is ONLINE
-       - Only jobs from last 5 minutes
-       - Worker cannot accept if has active job
+       LOAD AVAILABLE
+       + MAPA INSERTADO AQUÍ
     ----------------------------*/
     async function loadAvailable() {
         const status = await getWorkerStatus();
-
         availableList.innerHTML = "";
 
-        if (!status || !status.is_online) {
+        if (!status?.is_online) {
             availableList.innerHTML = `<div class="empty-message">
-                You are currently <b>offline</b>. Switch to Online to see available jobs.
+                You are <b>offline</b>. Go online to view jobs.
             </div>`;
             return;
         }
 
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const fiveMinutesAgo = new Date(Date.now() - 300000).toISOString();
 
-        const { data: jobs, error } = await supabase
+        const { data: jobs } = await supabase
             .from("jobs")
             .select("*")
             .is("worker_id", null)
@@ -564,25 +526,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             .gte("created_at", fiveMinutesAgo)
             .order("created_at", { ascending: true });
 
-        availableList.innerHTML = "";
-
-        if (error) {
-            console.error("Error loadAvailable:", error);
-            availableList.innerHTML = `<div class="empty-message">Error loading jobs.</div>`;
-            return;
-        }
-
-        if (!jobs || jobs.length === 0) {
-            availableList.innerHTML = `<div class="empty-message">No available jobs right now.</div>`;
+        if (!jobs?.length) {
+            availableList.innerHTML = `<div class="empty-message">No available jobs.</div>`;
             return;
         }
 
         jobs.forEach(job => {
+            const price = job.price?.toFixed?.(2) || "0.00";
+
             const div = document.createElement("div");
             div.className = "job-card";
-
-            const price = job.price?.toFixed ? job.price.toFixed(2) : "0.00";
-
             div.innerHTML = `
                 <div class="job-header">
                     <div class="job-title-block">
@@ -591,103 +544,96 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                     <div class="job-price">$${price}</div>
                 </div>
+
                 <div class="job-body">
                     <div class="job-row"><b>Category:</b> ${job.category}</div>
+
                     <div class="job-row"><b>Address:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
+
+                    <!-- MAPA AQUÍ -->
+                    <iframe
+                        width="100%"
+                        height="180"
+                        style="border:0; border-radius:12px; margin-top:8px;"
+                        loading="lazy"
+                        allowfullscreen
+                        src="https://maps.google.com/maps?q=${encodeURIComponent(job.street + ', ' + job.city + ', ' + job.state + ' ' + job.zipcode)}&t=&z=15&ie=UTF8&iwloc=&output=embed">
+                    </iframe>
+
                     <div class="job-row"><b>Payment:</b> ${job.payment_methods}</div>
                     <div class="job-row"><b>Details:</b> ${job.description}</div>
                     ${statusPill(job.status)}
                 </div>
+
                 <div class="job-footer">
                     <button class="action-btn-main">Accept Job</button>
                     <button class="action-btn-secondary">Open in Maps</button>
                 </div>
             `;
 
-            div.querySelector(".action-btn-main").addEventListener("click", async () => {
-                // Check if worker already has active job
+            div.querySelector(".action-btn-main").onclick = async () => {
                 const active = await getActiveJob();
-                if (active) {
-                    alert("You already have an active job. Complete or cancel it before accepting a new one.");
-                    return;
-                }
 
-                const { error: err } = await supabase.from("jobs").update({
-                    worker_id: w.id,
-                    worker_name: w.full_name,
-                    worker_phone: w.phone,
-                    worker_photo: w.profile_image,
-                    status: "accepted"
-                })
-                .eq("id", job.id)
-                .is("worker_id", null);
+                if (active) return alert("Finish your current job first.");
 
-                if (err) {
-                    console.error("Error accepting job:", err);
-                    alert("Could not accept job. Try again.");
-                    return;
-                }
+                await supabase.from("jobs")
+                    .update({
+                        worker_id: w.id,
+                        worker_name: w.full_name,
+                        worker_phone: w.phone,
+                        worker_photo: w.profile_image,
+                        status: "accepted"
+                    })
+                    .eq("id", job.id)
+                    .is("worker_id", null);
 
-                alert("Job accepted.");
-                await loadAll();
-            });
+                loadAll();
+            };
 
-            div.querySelector(".action-btn-secondary")
-                .addEventListener("click", () => window.open(mapsLink(job), "_blank"));
+            div.querySelector(".action-btn-secondary").onclick = () => {
+                window.open(mapsLink(job), "_blank");
+            };
 
             availableList.appendChild(div);
         });
     }
 
     /* ---------------------------
-       UPDATE JOB STATUS
+       UPDATE STATUS
     ----------------------------*/
     async function updateStatus(jobId, newStatus) {
-        const { error } = await supabase
-            .from("jobs")
+        await supabase.from("jobs")
             .update({ status: newStatus })
             .eq("id", jobId)
             .eq("worker_id", w.id);
 
-        if (error) {
-            console.error("Error updateStatus:", error);
-            alert("Could not update job status.");
-            return;
-        }
-
-        await loadAll();
+        loadAll();
     }
 
     /* ---------------------------
-       LOAD MY JOBS (ACTIVE)
+       LOAD MY JOBS
+       + MAPAS AQUÍ TAMBIÉN
     ----------------------------*/
     async function loadMyJobs() {
-        const { data: jobs, error } = await supabase
+        const { data: jobs } = await supabase
             .from("jobs")
             .select("*")
             .eq("worker_id", w.id)
-            .neq("status", "complete")
-            .neq("status", "cancelled")
-            .order("created_at", { ascending: false });
+            .not("status", "in", "('complete','cancelled')")
+            .order("created_at", { ascending:false });
 
         myJobsList.innerHTML = "";
 
-        if (error) {
-            console.error("Error loadMyJobs:", error);
-            myJobsList.innerHTML = `<div class="empty-message">Error loading your jobs.</div>`;
-            return;
-        }
-
-        if (!jobs || jobs.length === 0) {
+        if (!jobs?.length) {
             myJobsList.innerHTML = `<div class="empty-message">You have no active jobs.</div>`;
             return;
         }
 
         jobs.forEach(job => {
+            const price = job.price?.toFixed?.(2) || "0.00";
+
             const div = document.createElement("div");
             div.className = "job-card";
-
-            const price = job.price?.toFixed ? job.price.toFixed(2) : "0.00";
 
             div.innerHTML = `
                 <div class="job-header">
@@ -695,20 +641,30 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <div class="job-title">${job.title}</div>
                         <div class="job-client">Client: ${job.client_name}</div>
                         <div class="job-client"><b>Phone:</b> 
-                            <a href="tel:${job.client_phone}" style="color:#81ecec">
-                                ${job.client_phone}
-                            </a>
+                            <a href="tel:${job.client_phone}" style="color:#81ecec">${job.client_phone}</a>
                         </div>
                     </div>
                     <div class="job-price">$${price}</div>
                 </div>
+
                 <div class="job-body">
-                    <div class="job-row"><b>Category:</b> ${job.category}</div>
                     <div class="job-row"><b>Address:</b> ${job.street}, ${job.city}, ${job.state} ${job.zipcode}</div>
+
+                    <!-- MAPA -->
+                    <iframe
+                        width="100%"
+                        height="180"
+                        style="border:0; border-radius:12px; margin-top:8px;"
+                        loading="lazy"
+                        allowfullscreen
+                        src="https://maps.google.com/maps?q=${encodeURIComponent(job.street + ', ' + job.city + ', ' + job.state + ' ' + job.zipcode)}&t=&z=15&ie=UTF8&iwloc=&output=embed">
+                    </iframe>
+
                     <div class="job-row"><b>Payment:</b> ${job.payment_methods}</div>
                     <div class="job-row"><b>Details:</b> ${job.description}</div>
                     ${statusPill(job.status)}
                 </div>
+
                 <div class="job-footer" id="actions-${job.id}"></div>
             `;
 
@@ -727,7 +683,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 btn.onclick = () => updateStatus(job.id, "on_the_way");
                 actions.appendChild(btn);
             }
-
             if (job.status === "on_the_way") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
@@ -735,7 +690,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 btn.onclick = () => updateStatus(job.id, "arrived");
                 actions.appendChild(btn);
             }
-
             if (job.status === "arrived") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
@@ -743,7 +697,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 btn.onclick = () => updateStatus(job.id, "working");
                 actions.appendChild(btn);
             }
-
             if (job.status === "working") {
                 const btn = document.createElement("button");
                 btn.className = "action-btn-main";
@@ -758,9 +711,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     /* ---------------------------
        LOAD COMPLETED JOBS
+       + MAPA
     ----------------------------*/
     async function loadCompleted() {
-        const { data: jobs, error } = await supabase
+        const { data: jobs } = await supabase
             .from("jobs")
             .select("*")
             .eq("worker_id", w.id)
@@ -769,35 +723,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         completedList.innerHTML = "";
 
-        if (error) {
-            console.error("Error loadCompleted:", error);
-            completedList.innerHTML = `<div class="empty-message">Error loading completed jobs.</div>`;
-            return;
-        }
-
-        if (!jobs || jobs.length === 0) {
+        if (!jobs?.length) {
             completedList.innerHTML = `<div class="empty-message">No completed jobs.</div>`;
             return;
         }
 
         jobs.forEach(job => {
+            const price = job.price?.toFixed?.(2) || "0.00";
+
             const div = document.createElement("div");
             div.className = "job-card";
-
-            const price = job.price?.toFixed ? job.price.toFixed(2) : "0.00";
 
             div.innerHTML = `
                 <div class="job-header">
                     <div class="job-title">${job.title}</div>
                     <div class="job-price">$${price}</div>
                 </div>
+
                 <div class="job-body">
                     <div class="job-row"><b>Client:</b> ${job.client_name}</div>
                     <div class="job-row"><b>Phone:</b> ${job.client_phone}</div>
                     <div class="job-row"><b>Address:</b> ${job.street}, ${job.city}</div>
+
+                    <!-- MAPA -->
+                    <iframe
+                        width="100%"
+                        height="180"
+                        style="border:0; border-radius:12px; margin-top:8px;"
+                        loading="lazy"
+                        allowfullscreen
+                        src="https://maps.google.com/maps?q=${encodeURIComponent(job.street + ', ' + job.city)}&t=&z=15&ie=UTF8&iwloc=&output=embed">
+                    </iframe>
+
                     ${statusPill("complete")}
                 </div>
             `;
+
             completedList.appendChild(div);
         });
     }
@@ -835,112 +796,79 @@ document.addEventListener("DOMContentLoaded", async () => {
         completedList.style.display = "block";
     }
 
-    tabAvailable.addEventListener("click", showAvailable);
-    tabMyJobs.addEventListener("click", showMyJobs);
-    tabCompleted.addEventListener("click", showCompleted);
+    tabAvailable.onclick = showAvailable;
+    tabMyJobs.onclick = showMyJobs;
+    tabCompleted.onclick = showCompleted;
 
     /* ---------------------------
-       GO ONLINE (BIG OVERLAY BUTTON)
+       GO ONLINE
     ----------------------------*/
-    btnGoOnline.addEventListener("click", async () => {
+    btnGoOnline.onclick = async () => {
         await setWorkerOnlineState(true);
-        await updateOverlayAndFab();
-        await loadAll();
+        updateOverlayAndFab();
+        loadAll();
         showAvailable();
-    });
+    };
 
     /* ---------------------------
-       GO OFFLINE (FLOATING BUTTON)
+       GO OFFLINE BUTTON
     ----------------------------*/
-    function openDialog() {
-        dialogOverlay.style.display = "flex";
-    }
-    function closeDialog() {
-        dialogOverlay.style.display = "none";
-        activeJobCache = null;
-    }
-
-    fabOffline.addEventListener("click", async () => {
-        // Check if there is an active job
+    fabOffline.onclick = async () => {
         const active = await getActiveJob();
-        activeJobCache = active || null;
+        activeJobCache = active;
+
+        dialogOverlay.style.display = "flex";
 
         if (!active) {
-            // Simple confirm: go offline
             dialogTitle.textContent = "Go Offline?";
-            dialogText.textContent = "Are you sure you want to go offline? You won't receive new jobs.";
+            dialogText.textContent = "You will stop receiving new jobs.";
             dialogPrimary.textContent = "Yes, go offline";
             dialogDanger.style.display = "none";
             dialogGhost.textContent = "Cancel";
 
             dialogPrimary.onclick = async () => {
                 await setWorkerOnlineState(false);
-                await updateOverlayAndFab();
-                await loadAll();
-                closeDialog();
+                updateOverlayAndFab();
+                loadAll();
+                dialogOverlay.style.display = "none";
             };
 
-            dialogGhost.onclick = () => {
-                closeDialog();
-            };
+            dialogGhost.onclick = () => dialogOverlay.style.display = "none";
 
-            openDialog();
         } else {
-            // Has active job
             dialogTitle.textContent = "Active Job in Progress";
-            dialogText.textContent =
-                "You currently have an active job. You must complete it or cancel it before going offline.";
+            dialogText.textContent = "Complete or cancel your current job to go offline.";
             dialogPrimary.textContent = "Go to My Job";
             dialogDanger.textContent = "Cancel Job";
             dialogDanger.style.display = "block";
             dialogGhost.textContent = "Stay Online";
 
             dialogPrimary.onclick = () => {
-                // Simply open My Jobs tab
                 showMyJobs();
-                closeDialog();
+                dialogOverlay.style.display = "none";
             };
 
             dialogDanger.onclick = async () => {
-                // Cancel job: return it to the pool
-                const job = activeJobCache;
-                if (!job) return;
+                await supabase.from("jobs").update({
+                    worker_id: null,
+                    worker_name: null,
+                    worker_phone: null,
+                    worker_photo: null,
+                    status: "pending"
+                }).eq("id", active.id);
 
-                const { error } = await supabase
-                    .from("jobs")
-                    .update({
-                        worker_id: null,
-                        worker_name: null,
-                        worker_phone: null,
-                        worker_photo: null,
-                        status: "pending"
-                    })
-                    .eq("id", job.id);
-
-                if (error) {
-                    console.error("Error cancelling job:", error);
-                    alert("Could not cancel the job. Try again.");
-                    return;
-                }
-
-                // Now go offline
                 await setWorkerOnlineState(false);
-                await updateOverlayAndFab();
-                await loadAll();
-                closeDialog();
+                updateOverlayAndFab();
+                loadAll();
+                dialogOverlay.style.display = "none";
             };
 
-            dialogGhost.onclick = () => {
-                // Stay online
-                closeDialog();
-            };
-
-            openDialog();
+            dialogGhost.onclick = () => dialogOverlay.style.display = "none";
         }
-    });
+    };
 
     /* ---------------------------
-       LOAD EVERYTHING
+       LOAD ALL
     ----------------------------*/
     async function loadAll() {
         await loadAvailable();
@@ -966,6 +894,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
     </div>
     <div class="worker-chip" id="workerNameChip">Worker</div>
+
 </div>
 
 <!-- FULLSCREEN STATUS OVERLAY -->
@@ -1013,6 +942,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 <div class="section-title">My Jobs</div>
 <div id="myJobs" style="display:none;"></div>
+
 
 <div class="section-title">Completed Jobs</div>
 <div id="completedJobs" style="display:none;"></div>
