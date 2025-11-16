@@ -2,7 +2,7 @@
 import { supabase } from "./supabase.js";
 
 // ===================================
-// REGISTRO CON CONFIRMACIÓN DE EMAIL
+// REGISTRO + CONFIRMACIÓN DE EMAIL
 // ===================================
 document.getElementById("registerBtn")?.addEventListener("click", async () => {
 
@@ -20,7 +20,7 @@ document.getElementById("registerBtn")?.addEventListener("click", async () => {
     return alert("Faltan campos obligatorios.");
   }
 
-  // Crear usuario en Auth
+  // Crear usuario en AUTH
   const { data: auth, error: authError } = await supabase.auth.signUp({
     email,
     password,
@@ -29,25 +29,20 @@ document.getElementById("registerBtn")?.addEventListener("click", async () => {
     }
   });
 
-  if (authError) {
-    console.error(authError);
-    return alert(authError.message);
-  }
+  if (authError) return alert(authError.message);
 
-  // Guardar datos adicionales en tabla users
-  await supabase.from("users").insert({
-    id: auth.user.id, // ID real de Supabase Auth
+  // Guardar datos mientras el usuario confirma su email
+  localStorage.setItem("pending_user_info", JSON.stringify({
     full_name,
-    email,
     phone,
     street,
     city,
     state,
     zipcode,
     role
-  });
+  }));
 
-  alert("Cuenta creada. Revisa tu correo y confirma tu email para poder entrar.");
+  alert("Revisa tu correo para confirmar tu email.");
   location.href = "/login.html";
 });
 
@@ -69,27 +64,31 @@ document.getElementById("loginBtn")?.addEventListener("click", async () => {
     password
   });
 
-  if (error) {
-    console.error(error);
-    return alert(error.message);
-  }
+  if (error) return alert(error.message);
 
-  // Evitar login si no ha confirmado su email
   if (!data.user.email_confirmed_at) {
     return alert("Confirma tu correo antes de iniciar sesión.");
   }
 
-  // Obtener datos extra del usuario
+  // Actualizar datos si estaban pendientes del registro
+  const pending = JSON.parse(localStorage.getItem("pending_user_info"));
+  if (pending) {
+    await supabase.from("users")
+      .update(pending)
+      .eq("id", data.user.id);
+
+    localStorage.removeItem("pending_user_info");
+  }
+
+  // Obtener perfil completo
   const { data: profile } = await supabase
     .from("users")
     .select("*")
     .eq("id", data.user.id)
     .single();
 
-  // Guardar en localStorage
   localStorage.setItem("fixall_user", JSON.stringify(profile));
 
-  // Redirigir según rol
   if (profile.role === "client") {
     location.href = "/client/dashboard.html";
   } else {
