@@ -19,8 +19,7 @@
     }
   ],
   "display_override": [
-    "minimal-ui",
-    "standalone",
-    "window-controls-overlay"
+    "window-controls-overlay",
+    "fullscreen"
   ]
 }
