@@ -17,160 +17,127 @@
     --border-soft: rgba(255,255,255,0.12);
 }
 
-* { box-sizing: border-box; }
-
 body {
     margin: 0;
-    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: radial-gradient(circle at top, var(--bg2) 0%, var(--bg1) 55%, #02010a 100%);
+    background: radial-gradient(circle at top, var(--bg2), var(--bg1) 55%);
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
     color: var(--text-main);
-    padding-bottom: 70px;
+    padding-bottom: 80px;
 }
 
-/* TOPBAR */
 .topbar {
     background: rgba(10,10,28,0.7);
-    backdrop-filter: blur(14px);
-    text-align:center;
-    padding:18px 0;
-    border-bottom:1px solid rgba(255,255,255,0.08);
-    font-size:20px;
-    font-weight:800;
-    letter-spacing:0.03em;
-    position: sticky;
-    top:0;
+    padding: 20px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 800;
 }
 
-/* PROFILE CARD */
 .profile-card {
-    margin: 24px auto 14px;
-    max-width: 440px;
+    margin: 25px auto;
+    max-width: 460px;
     background: var(--card-bg);
-    border-radius: 20px;
-    padding: 30px 20px;
     border: 1px solid var(--border-soft);
-    box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+    border-radius: 22px;
+    padding: 28px;
     text-align: center;
 }
 
-.avatar {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
+.avatar-photo {
+    width: 130px;
+    height: 130px;
+    border-radius: 100%;
+    overflow: hidden;
     margin: 0 auto;
-    font-size: 48px;
-    font-weight: 800;
-    color: #fff;
-    background: linear-gradient(135deg, var(--primary), var(--primary2));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow: 0px 10px 30px rgba(108,92,231,0.55);
+}
+.avatar-photo img { width:100%; height:100%; object-fit:cover; }
+
+.avatar-letter {
+    width:130px;
+    height:130px;
+    border-radius:100%;
+    background: linear-gradient(135deg,var(--primary),var(--primary2));
+    display:flex; align-items:center; justify-content:center;
+    font-size:48px; font-weight:800; margin:auto;
 }
 
-.user-name {
-    margin-top: 16px;
-    font-size: 24px;
-    font-weight: 800;
-    color: #dedfff;
+.name {
+    font-size:24px;
+    font-weight:800;
+    margin-top:15px;
 }
 
-/* INFO CARD */
-.info-card {
-    margin: 14px auto;
-    max-width: 440px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 16px;
-    padding: 18px 20px;
-    box-shadow: 0px 8px 22px rgba(0,0,0,0.45);
+/* INFO BOX */
+.box {
+    width: 92%;
+    max-width: 460px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    padding: 18px;
+    margin: 18px auto;
 }
 
-.row {
-    margin: 10px 0;
-    font-size: 15px;
-}
-.row b {
-    color:#fff;
-}
+.row { margin:10px 0; font-size:16px; }
+.row b { color:#fff; }
 
-/* BUTTONS */
 .btn {
     display:block;
-    width:90%;
-    max-width: 430px;
+    width:92%;
     margin:14px auto;
     padding:15px;
+    border-radius:15px;
     text-align:center;
-    font-size:16px;
-    font-weight:700;
-    border-radius:14px;
+    font-weight:800;
     text-decoration:none;
 }
 
 .btn-edit {
-    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    background: linear-gradient(135deg,var(--primary),var(--primary2));
     color:white;
-    box-shadow:0 10px 26px rgba(108,92,231,0.5);
 }
 
 .btn-logout {
-    background:rgba(255,85,85,0.15);
-    border:1px solid rgba(255,100,100,0.4);
-    color:#ff6b6b;
+    background: rgba(255,80,80,0.15);
+    border:1px solid rgba(255,90,90,0.4);
+    color:#ff7777;
 }
 
-/* BOTTOM NAV */
+/* NAV */
 .bottom-nav {
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
+    position:fixed; bottom:0; left:0; right:0;
     background:rgba(10,10,28,0.96);
-    backdrop-filter:blur(14px);
-    border-top:1px solid rgba(255,255,255,0.06);
-    display:flex;
-    justify-content:space-around;
-    padding:6px 0 8px;
-}
-
-.nav-btn {
-    text-align:center;
-    font-size:11px;
-    color:var(--text-soft);
-    text-decoration:none;
-}
-
-.nav-btn span {
-    display:block;
-    font-size:20px;
-    margin-bottom:2px;
-}
-
-.nav-btn-active {
-    color:#a29bfe;
-    font-weight:700;
+    display:flex; justify-content:space-around;
+    padding:8px 0;
 }
 </style>
 
 <script type="module">
 document.addEventListener("DOMContentLoaded", () => {
+    const u = JSON.parse(localStorage.getItem("fixall_user"));
+    if (!u) return location.href="/login.html";
 
-  const u = JSON.parse(localStorage.getItem("fixall_user"));
-  if (!u) {
-    location.href = "/login.html";
-    return;
-  }
+    const avatarPhoto = document.getElementById("avatarPhoto");
+    const avatarLetter = document.getElementById("avatarLetter");
+    const avatarImg = document.getElementById("avatarImg");
 
-  document.getElementById("avatar").textContent = u.full_name?.charAt(0)?.toUpperCase() || "U";
-  document.getElementById("fullName").textContent = u.full_name;
-  document.getElementById("email").textContent = u.email;
-  document.getElementById("phone").textContent = u.phone;
-  document.getElementById("street").textContent = u.street;
-  document.getElementById("city").textContent = u.city;
-  document.getElementById("stateTxt").textContent = u.state;
-  document.getElementById("zipcode").textContent = u.zipcode;
+    if (u.profile_image) {
+        avatarPhoto.style.display = "block";
+        avatarLetter.style.display = "none";
+        avatarImg.src = u.profile_image;
+    } else {
+        avatarPhoto.style.display = "none";
+        avatarLetter.style.display = "flex";
+        avatarLetter.textContent = u.full_name.charAt(0).toUpperCase();
+    }
 
+    document.getElementById("fullName").textContent = u.full_name;
+    document.getElementById("email").textContent = u.email;
+    document.getElementById("phone").textContent = u.phone;
+    document.getElementById("street").textContent = u.street;
+    document.getElementById("city").textContent = u.city;
+    document.getElementById("stateTxt").textContent = u.state;
+    document.getElementById("zipcode").textContent = u.zipcode;
 });
 </script>
 
@@ -180,37 +147,30 @@ document.addEventListener("DOMContentLoaded", () => {
 <div class="topbar">My Profile</div>
 
 <div class="profile-card">
-  <div class="avatar" id="avatar">U</div>
-  <div class="user-name" id="fullName">User</div>
+    <div id="avatarPhoto" class="avatar-photo">
+        <img id="avatarImg" src="">
+    </div>
+
+    <div id="avatarLetter" class="avatar-letter">U</div>
+
+    <div class="name" id="fullName">User</div>
 </div>
 
-<div class="info-card">
-  <div class="row"><b>Email:</b> <span id="email"></span></div>
-  <div class="row"><b>Phone:</b> <span id="phone"></span></div>
-  <div class="row"><b>Street:</b> <span id="street"></span></div>
-  <div class="row"><b>City:</b> <span id="city"></span></div>
-  <div class="row"><b>State:</b> <span id="stateTxt"></span></div>
-  <div class="row"><b>ZIP Code:</b> <span id="zipcode"></span></div>
+<div class="box">
+    <div class="row"><b>Email:</b> <span id="email"></span></div>
+    <div class="row"><b>Phone:</b> <span id="phone"></span></div>
+    <div class="row"><b>Street:</b> <span id="street"></span></div>
+    <div class="row"><b>City:</b> <span id="city"></span></div>
+    <div class="row"><b>State:</b> <span id="stateTxt"></span></div>
+    <div class="row"><b>ZIP Code:</b> <span id="zipcode"></span></div>
 </div>
 
 <a class="btn btn-edit" href="/client/edit-profile.html">Edit Profile</a>
+<a class="btn btn-logout" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">Log Out</a>
 
-<a class="btn btn-logout"
-   onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
-   Log Out
-</a>
-
-<!-- NAV BAR -->
 <div class="bottom-nav">
-  <a class="nav-btn" href="/client/dashboard.html">
-    <span>🏠</span> Home
-  </a>
-  <a class="nav-btn nav-btn-active" href="/client/profile.html">
-    <span>👤</span> Profile
-  </a>
-  <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
-    <span>🚪</span> Logout
-  </a>
+    <a href="/client/dashboard.html">🏠</a>
+    <a href="/client/profile.html">👤</a>
 </div>
 
 </body>

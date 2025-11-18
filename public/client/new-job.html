@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -214,13 +214,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 client_id: u.id,
                 client_name: u.full_name,
                 client_phone: u.phone,
+                client_profile_image: u.profile_image,   // 🔥 FOTO DEL CLIENTE
+
                 title,
                 description,
                 category,
+
                 street: u.street,
                 city: u.city,
                 state: u.state,
                 zipcode: u.zipcode,
+
                 price,
                 payment_methods,
                 status: "pending"

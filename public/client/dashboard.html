@@ -85,12 +85,28 @@ body {
 .hero-stat-pill {
     background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius:999px;
 }
+
+/* HERO AVATAR */
 .hero-avatar {
-    width: 44px; height: 44px; border-radius: 999px;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
     background: rgba(0,0,0,0.18);
     border: 2px solid rgba(255,255,255,0.8);
-    display:flex; align-items:center; justify-content:center;
-    font-weight:800; font-size:20px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:20px;
+}
+
+.hero-avatar img {
+    width:100%; height:100%; object-fit:cover; display:none;
+}
+
+.hero-avatar span {
+    display:none;
 }
 
 /* NEW JOB BUTTON */
@@ -134,7 +150,6 @@ body {
 .job-category { font-size:11px; color:var(--text-soft); }
 .job-price { font-size:16px; font-weight:800; color:var(--accent-green); }
 
-/* STATUS PILL */
 .status-pill {
     margin-top: 8px;
     padding: 4px 10px;
@@ -196,28 +211,87 @@ body {
     display:flex;
     justify-content:space-around;
     padding:6px 0 8px;
+    z-index: 50;
 }
 .nav-btn { text-align:center; color:var(--text-soft); font-size:11px; text-decoration:none; }
 .nav-btn span { font-size:20px; display:block; }
 .nav-btn-active { color:#a29bfe; font-weight:700; }
+
+/* 🔔 TOAST NOTIFICATION */
+.toast-container {
+    position: fixed;
+    bottom: 80px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    z-index: 999;
+    pointer-events: none;
+}
+
+.toast {
+    min-width: 240px;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(24,24,48,0.95);
+    border: 1px solid rgba(162,155,254,0.7);
+    color: #fff;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: auto;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.toast-icon {
+    font-size: 18px;
+}
 </style>
 
 <script type="module">
 import { supabase } from "/js/supabase.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const u = JSON.parse(localStorage.getItem("fixall_user"));
 
+    const u = JSON.parse(localStorage.getItem("fixall_user"));
     if (!u || u.role !== "client") {
         location.href = "/login.html";
         return;
     }
 
+    /* ===========================
+          FOTO DEL CLIENTE 🔥
+       =========================== */
 
+    const avatarContainer = document.getElementById("heroAvatar");
+    const img = document.getElementById("heroAvatarImg");
+    const letter = document.getElementById("heroAvatarLetter");
 
-    // HERO
+    if (u.profile_image) {
+        img.src = u.profile_image;
+        img.style.display = "block";
+        letter.style.display = "none";
+    } else {
+        img.style.display = "none";
+        letter.style.display = "flex";
+        letter.textContent = u.full_name.charAt(0).toUpperCase();
+    }
+
+    // NOMBRE DEL HERO
     document.getElementById("heroName").textContent = u.full_name;
-    document.getElementById("heroAvatar").textContent = u.full_name.charAt(0).toUpperCase();
+
+    /* ===========================
+            CARGAR JOBS
+       =========================== */
 
     const jobsList = document.getElementById("jobsList");
 
@@ -254,7 +328,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const price = job.price ?? "0.00";
 
             div.innerHTML = `
-                <div class="job-header">
+                <div class="job-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
                     <div>
                         <div class="job-title">${job.title}</div>
                         <div class="job-category">${job.category}</div>
@@ -262,7 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="job-price">$${price}</div>
                 </div>
 
-                <div class="job-body">
+                <div class="job-body" style="margin-top:8px; font-size:12px; color:${'var(--text-soft)'};">
                     <div><b>Address:</b> ${job.street}, ${job.city}</div>
                     <div><b>Payment method:</b> ${job.payment_methods}</div>
                     <div><b>Details:</b> ${job.description}</div>
@@ -273,30 +347,26 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
 
                 <div class="job-footer">
-
                     <div class="worker-card">
                         ${
                             job.worker_name
                             ?
-`
-<div style="display:flex; gap:10px; align-items:center;">
+`<div style="display:flex; gap:10px; align-items:center;">
     <img src="${job.worker_photo || '/img/nouser.png'}"
          style="width:45px; height:45px; border-radius:50%; border:2px solid rgba(255,255,255,0.2); object-fit:cover;">
     <div>
         <b>Worker:</b> ${job.worker_name}<br>
         <b>Phone:</b> <a href="tel:${job.worker_phone}" style="color:#81ecec;">${job.worker_phone}</a>
     </div>
-</div>
-`
+</div>`
                             :
                             "No worker assigned yet."
                         }
                     </div>
-
                 </div>
             `;
 
-            // CANCEL JOB
+            // CANCEL JOB BUTTON
             if (["pending","accepted","on_the_way"].includes(job.status)) {
                 const btn = document.createElement("div");
                 btn.className = "btn-cancel";
@@ -318,44 +388,97 @@ document.addEventListener("DOMContentLoaded", async () => {
                     loadJobs();
                 };
 
-                div.querySelector(".job-footer").appendChild(btn);
+                div.appendChild(btn);
             }
 
             jobsList.appendChild(div);
         });
     }
 
-    loadJobs();
+    await loadJobs();
 
-    /* ---------------------------------------
-       REALTIME PARA CLIENTE
-       Escucha cambios en tiempo real en 'jobs'
-    ----------------------------------------*/
-    const clientRealtime = supabase
+    /* ===========================
+        GLOBAL NOTIFICATION 🔔
+       =========================== */
+
+    const sound = document.getElementById("statusSound");
+    const toastContainer = document.getElementById("toastContainer");
+
+    function playStatusSound() {
+        if (!sound) return;
+        sound.currentTime = 0;
+        sound.play().catch(() => {
+            // navegador bloqueó autoplay, no pasa nada
+        });
+    }
+
+    function showToast(message) {
+        if (!toastContainer) return;
+
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerHTML = `
+            <div class="toast-icon">🔔</div>
+            <div>${message}</div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Forzar reflow para activar transición
+        void toast.offsetHeight;
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => {
+                toast.remove();
+            }, 250);
+        }, 4000);
+    }
+
+    const STATUS_MESSAGES = {
+        accepted: "A worker accepted your job.",
+        on_the_way: "Your worker is on the way.",
+        working: "Your worker started working.",
+        complete: "Your job is complete.",
+        cancelled: "Your job was cancelled."
+    };
+
+    supabase
       .channel("jobs-realtime-client")
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "jobs"
-        },
+        { event: "*", schema: "public", table: "jobs" },
         async (payload) => {
-          console.log("CLIENTE - cambio realtime:", payload);
+          const oldRow = payload.old;
+          const newRow = payload.new;
 
-          // Recargar solo si el trabajo pertenece a este cliente
-          const newJob = payload.new;
-          const oldJob = payload.old;
+          // Solo jobs de este cliente
+          const isClientJob =
+            (newRow && newRow.client_id === u.id) ||
+            (oldRow && oldRow.client_id === u.id);
 
-          if ((newJob && newJob.client_id === u.id) ||
-              (oldJob && oldJob.client_id === u.id)) {
-            
-            await loadJobs(); // 🔥 REFRESCA EN TIEMPO REAL
+          if (!isClientJob) return;
+
+          // Si hay cambio de estado
+          if (oldRow && newRow && oldRow.status !== newRow.status) {
+              const newStatus = newRow.status;
+
+              // Mensaje amigable
+              const msg = STATUS_MESSAGES[newStatus];
+              if (msg) {
+                  playStatusSound();
+                  showToast(msg);
+              } else {
+                  // Si es un estado que no está mapeado, solo sonido
+                  playStatusSound();
+              }
           }
+
+          await loadJobs();
         }
       )
       .subscribe();
-
 });
 </script>
 
@@ -388,7 +511,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="hero-stat-pill">Payments & Support</div>
         </div>
     </div>
-    <div class="hero-avatar" id="heroAvatar">C</div>
+
+    <div class="hero-avatar" id="heroAvatar">
+        <img id="heroAvatarImg">
+        <span id="heroAvatarLetter"></span>
+    </div>
 </div>
 
 <!-- NEW JOB BUTTON -->
@@ -400,11 +527,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="new-job-sub">Electrician, plumbing, cleaning and more</div>
         </div>
     </div>
-    <div class="new-job-chevron">›</div>
 </a>
 
 <div class="section-title">My Jobs</div>
 <div id="jobsList"></div>
+
+<!-- 🔔 AUDIO GLOBAL PARA PWA -->
+<audio id="statusSound" src="/sounds/status.mp3" preload="auto"></audio>
+<div id="toastContainer" class="toast-container"></div>
 
 <!-- NAV -->
 <div class="bottom-nav">

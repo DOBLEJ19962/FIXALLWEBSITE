@@ -27,7 +27,6 @@ body {
     padding-bottom: 70px;
 }
 
-/* TOP BAR */
 .topbar {
     background: rgba(10,10,28,0.7);
     backdrop-filter: blur(12px);
@@ -36,12 +35,8 @@ body {
     text-align: center;
     font-size: 18px;
     font-weight: 800;
-    letter-spacing: 0.03em;
-    position: sticky;
-    top: 0;
 }
 
-/* PROFILE BOX */
 .profile-box {
     margin: 20px auto;
     max-width: 430px;
@@ -49,20 +44,46 @@ body {
     background: var(--card-bg);
     border: 1px solid var(--border-soft);
     border-radius: 18px;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.5);
 }
 
-/* LABELS */
+/* FOTO DE PERFIL */
+.avatar-wrap {
+    text-align:center;
+    margin-bottom:18px;
+}
+.avatar {
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    overflow:hidden;
+    background:rgba(255,255,255,0.1);
+    border:2px solid var(--border-soft);
+    margin:auto;
+}
+.avatar img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+.upload-btn {
+    margin-top:12px;
+    background:rgba(255,255,255,0.1);
+    padding:10px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    display:inline-block;
+    font-size:14px;
+    border:1px solid var(--border-soft);
+}
+
 label {
     display: block;
     margin: 14px 0 6px;
     font-size: 13px;
     font-weight: 700;
     color: var(--text-soft);
-    letter-spacing: 0.03em;
 }
 
-/* INPUTS */
 input {
     width: 100%;
     padding: 13px;
@@ -71,15 +92,8 @@ input {
     border: 1px solid var(--border-soft);
     background: var(--input-bg);
     color: var(--text-main);
-    outline: none;
 }
 
-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(108,92,231,0.5);
-}
-
-/* BUTTON SAVE */
 button {
     width: 100%;
     padding: 15px;
@@ -91,19 +105,11 @@ button {
     background: linear-gradient(135deg, #6c5ce7, #9b59b6);
     color: white;
     cursor: pointer;
-    box-shadow: 0 10px 24px rgba(108,92,231,0.6);
 }
 
-button:active {
-    transform: scale(0.98);
-}
-
-/* NAV BAR */
 .bottom-nav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 0; left: 0; right: 0;
     background: rgba(10,10,25,0.96);
     backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255,255,255,0.06);
@@ -111,37 +117,18 @@ button:active {
     justify-content: space-around;
     padding: 6px 0 8px;
 }
-
-.nav-btn {
-    text-align: center;
-    font-size: 11px;
-    color: var(--text-soft);
-    text-decoration: none;
-}
-
-.nav-btn span {
-    display: block;
-    font-size: 20px;
-    margin-bottom: 2px;
-}
-
-.nav-btn-active {
-    color: #a29bfe;
-    font-weight: 700;
-}
 </style>
 
 <script type="module">
+import { supabase } from "/js/supabase.js";
 import { updateProfile } from "/js/auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 
   const u = JSON.parse(localStorage.getItem("fixall_user"));
-  if (!u) {
-    location.href = "/login.html";
-    return;
-  }
+  if (!u) return location.href="/login.html";
 
+  // INPUTS
   const nameEl = document.getElementById("name");
   const emailEl = document.getElementById("email");
   const phoneEl = document.getElementById("phone");
@@ -150,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const stateEl = document.getElementById("state");
   const zipcodeEl = document.getElementById("zipcode");
 
-  // Load user data
+  // RELLENAR CAMPOS
   nameEl.value = u.full_name || "";
   emailEl.value = u.email || "";
   phoneEl.value = u.phone || "";
@@ -159,7 +146,50 @@ document.addEventListener("DOMContentLoaded", () => {
   stateEl.value = u.state || "";
   zipcodeEl.value = u.zipcode || "";
 
+  // FOTO
+  const avatarImg = document.getElementById("avatarImg");
+  const fileInput = document.getElementById("fileInput");
+  avatarImg.src = u.profile_image || "/img/nouser.png";
+
+  // SUBIR FOTO
+  async function uploadImage(file) {
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}.${ext}`;
+      const filePath = `${u.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+          .from("profiles")
+          .upload(filePath, file, {
+              contentType: file.type,
+              upsert: true
+          });
+
+      if (uploadError) {
+          alert("Upload error: " + uploadError.message);
+          return null;
+      }
+
+      const { data } = supabase.storage
+          .from("profiles")
+          .getPublicUrl(filePath);
+
+      return data.publicUrl;
+  }
+
+  fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const url = await uploadImage(file);
+      if (!url) return;
+
+      avatarImg.src = url;
+      u.profile_image = url;
+  });
+
+  // GUARDAR CAMBIOS
   document.getElementById("saveBtn").addEventListener("click", async () => {
+
     const updated = {
       full_name: nameEl.value.trim(),
       email: emailEl.value.trim(),
@@ -167,23 +197,21 @@ document.addEventListener("DOMContentLoaded", () => {
       street: streetEl.value.trim(),
       city: cityEl.value.trim(),
       state: stateEl.value.trim(),
-      zipcode: zipcodeEl.value.trim()
+      zipcode: zipcodeEl.value.trim(),
+      profile_image: u.profile_image || null
     };
 
     const { error } = await updateProfile(updated, u.id);
 
     if (error) {
-      alert("Error updating profile: " + error.message);
-    } else {
-      alert("Profile updated successfully");
-
-      // Update local storage
-      const newUser = { ...u, ...updated };
-      localStorage.setItem("fixall_user", JSON.stringify(newUser));
-
-      location.href = "/client/profile.html";
+      alert("Error updating: " + error.message);
+      return;
     }
+
+    alert("Profile updated!");
+    location.href="/client/profile.html";
   });
+
 });
 </script>
 
@@ -194,41 +222,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <div class="profile-box">
 
-  <label>Full Name</label>
-  <input id="name" type="text">
+    <div class="avatar-wrap">
+        <div class="avatar">
+            <img id="avatarImg" src="">
+        </div>
+        <label class="upload-btn">
+            Upload Photo
+            <input type="file" id="fileInput" accept="image/*" hidden>
+        </label>
+    </div>
 
-  <label>Email</label>
-  <input id="email" type="email">
+    <label>Full Name</label>
+    <input id="name">
 
-  <label>Phone</label>
-  <input id="phone" type="tel">
+    <label>Email</label>
+    <input id="email" type="email">
 
-  <label>Street</label>
-  <input id="street" type="text">
+    <label>Phone</label>
+    <input id="phone">
 
-  <label>City</label>
-  <input id="city" type="text">
+    <label>Street</label>
+    <input id="street">
 
-  <label>State</label>
-  <input id="state" type="text">
+    <label>City</label>
+    <input id="city">
 
-  <label>ZIP Code</label>
-  <input id="zipcode" type="text">
+    <label>State</label>
+    <input id="state">
 
-  <button id="saveBtn">Save Changes</button>
+    <label>ZIP Code</label>
+    <input id="zipcode">
+
+    <button id="saveBtn">Save Changes</button>
 
 </div>
 
 <div class="bottom-nav">
-  <a class="nav-btn" href="/client/dashboard.html">
-    <span>🏠</span> Home
-  </a>
-  <a class="nav-btn nav-btn-active" href="/client/profile.html">
-    <span>👤</span> Profile
-  </a>
-  <a class="nav-btn" href="#" onclick="localStorage.removeItem('fixall_user'); location.href='/login.html';">
-    <span>🚪</span> Logout
-  </a>
+    <a href="/client/dashboard.html">🏠</a>
+    <a href="/client/profile.html">👤</a>
 </div>
 
 </body>
