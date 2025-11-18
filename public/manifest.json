@@ -19,7 +19,6 @@
     }
   ],
   "display_override": [
-    "browser",
     "minimal-ui",
     "standalone",
     "window-controls-overlay"
