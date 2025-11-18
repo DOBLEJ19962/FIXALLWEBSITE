@@ -12,7 +12,14 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Servir frontend desde /public
+// 👉 Servir la carpeta .well-known desde la raíz del proyecto
+//    Esto hace que https://tudominio.com/.well-known/assetlinks.json funcione
+app.use(
+  "/.well-known",
+  express.static(path.join(__dirname, ".well-known"))
+);
+
+// 👉 Servir frontend desde /public
 app.use(express.static(path.join(__dirname, "public")));
 
 // Importar APIs
