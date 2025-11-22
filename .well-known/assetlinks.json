@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.onrender.fixallhomeservice.twa",
-        "sha256_cert_fingerprints": ["B6:59:97:66:A3:F6:97:1B:40:33:5B:8A:46:35:FE:A0:F7:93:09:91:C3:3F:E9:F4:1F:80:A9:DC:33:CB:15:20"]
-      }
-    }]

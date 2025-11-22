@@ -1,258 +1,1368 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>FIXALL Admin Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FixAll Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #202449 0%, #050612 55%, #02010a 100%);
+      color: #f9fafb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: #6366f1;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+    }
+    .chip {
+      border-radius: 9999px;
+      padding: 2px 10px;
+      font-size: 11px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .tab-active {
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      color: white;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 flex h-screen">
+<body class="h-screen flex">
+
   <!-- SIDEBAR -->
-  <aside class="w-64 bg-gray-900 text-white flex flex-col">
-    <div class="p-6 text-2xl font-bold border-b border-gray-700">FixAll Admin</div>
-    <nav class="flex-1 p-4 space-y-2">
-      <a href="#users" class="block p-3 rounded hover:bg-gray-700">Users</a>
-      <a href="#workers" class="block p-3 rounded hover:bg-gray-700">Workers</a>
-      <a href="#jobs" class="block p-3 rounded hover:bg-gray-700">Jobs</a>
+  <aside class="w-72 glass h-screen flex flex-col p-6">
+    <div class="flex items-center gap-3 mb-8">
+      <div class="h-10 w-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-fuchsia-500 flex items-center justify-center font-black text-xl">
+        F
+      </div>
+      <div>
+        <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Admin</div>
+        <div class="text-lg font-bold">FixAll Control</div>
+      </div>
+    </div>
+
+    <nav class="flex flex-col gap-2 text-sm">
+      <button onclick="showTab('pending')" id="tab-btn-pending"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/60">
+        <span>🕒</span> Pending Workers
+      </button>
+      <button onclick="showTab('verified')" id="tab-btn-verified"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/60">
+        <span>✅</span> Verified Workers
+      </button>
+      <button onclick="showTab('clients')" id="tab-btn-clients"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/60">
+        <span>👥</span> Clients
+      </button>
+      <button onclick="showTab('users')" id="tab-btn-users"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/60">
+        <span>🧰</span> Workers
+      </button>
+
+      <!-- NUEVOS TABS -->
+      <button onclick="showTab('jobs')" id="tab-btn-jobs"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/60">
+        <span>📋</span> Jobs
+      </button>
+      <button onclick="showTab('reviews')" id="tab-btn-reviews"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/60">
+        <span>⭐</span> Reviews
+      </button>
     </nav>
+
+    <div class="mt-auto text-xs text-slate-500">
+      © 2025 FIXALL • Internal Use Only
+    </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
-  <main class="flex-1 overflow-y-auto p-6 space-y-20">
+  <!-- MAIN -->
+  <main class="flex-1 p-8 overflow-y-auto">
+    <!-- HEADER + SEARCH + STATS -->
+    <div class="flex flex-col gap-4 mb-8">
+      <div class="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-black">Admin Dashboard</h1>
+          <p class="text-sm text-slate-400">Review workers, users, jobs and verifications in one place.</p>
+        </div>
 
-    <!-- USERS SECTION -->
-    <section id="users" class="space-y-4">
-      <h2 class="text-3xl font-bold mb-6">Users</h2>
-      
-      <table class="w-full bg-white shadow rounded text-sm">
-        <thead>
-          <tr class="bg-gray-200 text-left">
-            <th class="p-3">Photo</th>
-            <th class="p-3">Full Name</th>
-            <th class="p-3">Email</th>
-            <th class="p-3">Phone</th>
-            <th class="p-3">City</th>
-            <th class="p-3">Role</th>
-            <th class="p-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="usersTable"></tbody>
-      </table>
+        <div class="w-full md:w-80">
+          <input
+            id="searchInput"
+            oninput="searchGlobal()"
+            placeholder="Search by name, email, phone, SSN, job..."
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="glass rounded-2xl p-4 flex flex-col gap-1">
+          <span class="text-xs tracking-wide text-slate-400 uppercase">Total Users</span>
+          <span id="stat-users" class="text-2xl font-bold">0</span>
+        </div>
+        <div class="glass rounded-2xl p-4 flex flex-col gap-1">
+          <span class="text-xs tracking-wide text-slate-400 uppercase">Workers</span>
+          <span id="stat-workers" class="text-2xl font-bold">0</span>
+        </div>
+        <div class="glass rounded-2xl p-4 flex flex-col gap-1">
+          <span class="text-xs tracking-wide text-slate-400 uppercase">Pending</span>
+          <span id="stat-pending" class="text-2xl font-bold text-yellow-300">0</span>
+        </div>
+        <div class="glass rounded-2xl p-4 flex flex-col gap-1">
+          <span class="text-xs tracking-wide text-slate-400 uppercase">Verified</span>
+          <span id="stat-verified" class="text-2xl font-bold text-emerald-300">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PENDING WORKERS -->
+    <section id="tab-pending" class="tab">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">Pending Workers</h2>
+        <span class="chip bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">
+          Waiting for review
+        </span>
+      </div>
+
+      <div id="pendingWorkers" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3"></div>
     </section>
 
-    <!-- WORKERS SECTION -->
-    <section id="workers" class="space-y-4">
-      <h2 class="text-3xl font-bold mb-6">Workers</h2>
+    <!-- TAB: VERIFIED WORKERS -->
+    <section id="tab-verified" class="tab hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">Verified Workers</h2>
+        <span class="chip bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+          Approved & Active
+        </span>
+      </div>
 
-      <table class="w-full bg-white shadow rounded text-sm">
-        <thead>
-          <tr class="bg-gray-200 text-left">
-            <th class="p-3">Photo</th>
-            <th class="p-3">Full Name</th>
-            <th class="p-3">Email</th>
-            <th class="p-3">Phone</th>
-            <th class="p-3">City</th>
-            <th class="p-3">Experience</th>
-            <th class="p-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="workersTable"></tbody>
-      </table>
+      <div class="glass rounded-2xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-900/70 text-slate-300">
+            <tr>
+              <th class="p-3 text-left">Photo</th>
+              <th class="p-3 text-left">Full Name</th>
+              <th class="p-3 text-left">Email</th>
+              <th class="p-3 text-left">Phone</th>
+              <th class="p-3 text-left">City</th>
+              <th class="p-3 text-left">SSN</th>
+              <th class="p-3 text-left">Verified</th>
+              <th class="p-3 text-left">Suspended</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="workersTable"></tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- JOBS SECTION -->
-    <section id="jobs" class="space-y-4">
-      <h2 class="text-3xl font-bold mb-6">Jobs</h2>
-      <table class="w-full bg-white shadow rounded text-sm">
-        <thead>
-          <tr class="bg-gray-200 text-left">
-            <th class="p-3">Client</th>
-            <th class="p-3">Worker</th>
-            <th class="p-3">Status</th>
-          </tr>
-        </thead>
-        <tbody id="jobsTable"></tbody>
-      </table>
+    <!-- TAB: CLIENTS -->
+    <section id="tab-clients" class="tab hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">Clients</h2>
+        <span class="chip bg-slate-700/70 text-slate-200 border border-slate-500/60">
+          Clients
+        </span>
+      </div>
+
+      <div class="glass rounded-2xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-900/70 text-slate-300">
+            <tr>
+              <th class="p-3 text-left">Photo</th>
+              <th class="p-3 text-left">Name</th>
+              <th class="p-3 text-left">Email</th>
+              <th class="p-3 text-left">Role</th>
+              <th class="p-3 text-left">City</th>
+              <th class="p-3 text-left">Phone</th>
+              <th class="p-3 text-left">Verified</th>
+              <th class="p-3 text-left">Suspended</th>
+              <th class="p-3 text-left">Created</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clientsTable"></tbody>
+        </table>
+      </div>
     </section>
 
+    <!-- TAB: WORKERS (ALL WORKERS USERS) -->
+    <section id="tab-users" class="tab hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">Workers</h2>
+        <span class="chip bg-slate-700/70 text-slate-200 border border-slate-500/60">
+          Workers
+        </span>
+      </div>
+
+      <div class="glass rounded-2xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-900/70 text-slate-300">
+            <tr>
+              <th class="p-3 text-left">Photo</th>
+              <th class="p-3 text-left">Name</th>
+              <th class="p-3 text-left">Email</th>
+              <th class="p-3 text-left">Role</th>
+              <th class="p-3 text-left">City</th>
+              <th class="p-3 text-left">Phone</th>
+              <th class="p-3 text-left">Verified</th>
+              <th class="p-3 text-left">Suspended</th>
+              <th class="p-3 text-left">Created</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: JOBS -->
+    <section id="tab-jobs" class="tab hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">Jobs</h2>
+        <span class="chip bg-slate-700/70 text-slate-200 border border-slate-500/60">
+          Available • In Progress • Completed • Future
+        </span>
+      </div>
+
+      <div class="space-y-6">
+        <!-- AVAILABLE -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-semibold text-slate-100">Available Jobs</h3>
+            <span class="text-[11px] text-slate-400 uppercase tracking-wide">
+              Sin trabajador asignado
+            </span>
+          </div>
+          <div class="glass rounded-2xl overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-900/70 text-slate-300">
+                <tr>
+                  <th class="p-3 text-left">Title</th>
+                  <th class="p-3 text-left">Client</th>
+                  <th class="p-3 text-left">Worker</th>
+                  <th class="p-3 text-left">Price</th>
+                  <th class="p-3 text-left">Date</th>
+                  <th class="p-3 text-left">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="jobsAvailableTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- IN PROGRESS -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-semibold text-slate-100">Jobs In Progress</h3>
+            <span class="text-[11px] text-slate-400 uppercase tracking-wide">
+              Aceptados por un trabajador
+            </span>
+          </div>
+          <div class="glass rounded-2xl overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-900/70 text-slate-300">
+                <tr>
+                  <th class="p-3 text-left">Title</th>
+                  <th class="p-3 text-left">Client</th>
+                  <th class="p-3 text-left">Worker</th>
+                  <th class="p-3 text-left">Price</th>
+                  <th class="p-3 text-left">Date</th>
+                  <th class="p-3 text-left">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="jobsInProgressTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- COMPLETED -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-semibold text-slate-100">Completed Jobs</h3>
+            <span class="text-[11px] text-slate-400 uppercase tracking-wide">
+              Terminados y/o pagados
+            </span>
+          </div>
+          <div class="glass rounded-2xl overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-900/70 text-slate-300">
+                <tr>
+                  <th class="p-3 text-left">Title</th>
+                  <th class="p-3 text-left">Client</th>
+                  <th class="p-3 text-left">Worker</th>
+                  <th class="p-3 text-left">Price</th>
+                  <th class="p-3 text-left">Date</th>
+                  <th class="p-3 text-left">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="jobsCompletedTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- FUTURE / SCHEDULED -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-semibold text-slate-100">Upcoming / Scheduled Jobs</h3>
+            <span class="text-[11px] text-slate-400 uppercase tracking-wide">
+              Jobs futuros programados
+            </span>
+          </div>
+          <div class="glass rounded-2xl overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-900/70 text-slate-300">
+                <tr>
+                  <th class="p-3 text-left">Title</th>
+                  <th class="p-3 text-left">Client</th>
+                  <th class="p-3 text-left">Worker</th>
+                  <th class="p-3 text-left">Price</th>
+                  <th class="p-3 text-left">Date</th>
+                  <th class="p-3 text-left">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="jobsFutureTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: REVIEWS -->
+    <section id="tab-reviews" class="tab hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">Worker Reviews</h2>
+        <span class="chip bg-indigo-500/20 text-indigo-200 border border-indigo-400/50">
+          Ratings & feedback
+        </span>
+      </div>
+
+      <div class="glass rounded-2xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-900/70 text-slate-300">
+            <tr>
+              <th class="p-3 text-left">Worker</th>
+              <th class="p-3 text-left">Client</th>
+              <th class="p-3 text-left">Rating</th>
+              <th class="p-3 text-left">Comment</th>
+              <th class="p-3 text-left">Created</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reviewsTable"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
+  <!-- MODAL DETALLES -->
+  <div id="detailsModal"
+       class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center">
+    <div class="glass rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
+      <button onclick="closeDetails()"
+              class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl">
+        ✕
+      </button>
+      <h3 id="detailsTitle" class="text-xl font-bold mb-4">Details</h3>
 
+      <div id="detailsBody" class="space-y-6"></div>
+    </div>
+  </div>
 
-<!-- MAIN SCRIPT -->
-<script type="module">
-  import { supabase } from "../js/supabase.js";
+  <!-- MODAL SUSPENSIÓN -->
+  <div id="suspendModal"
+       class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
+    <div class="glass rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 relative">
+      <button onclick="closeSuspendModal()"
+              class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl">
+        ✕
+      </button>
 
+      <h3 class="text-xl font-bold mb-2">Suspender cuenta</h3>
+      <p class="text-sm text-slate-300 mb-4">
+        Selecciona el motivo principal de la suspensión. El texto se guardará en el campo
+        <span class="font-mono">suspension_message</span> del usuario.
+      </p>
 
-  /* ===========================
-        LOAD USERS
-  ============================ */
-  async function loadUsers() {
-    const { data, error } = await supabase.from("users").select("*");
-    const table = document.getElementById("usersTable");
+      <div id="suspendUserName" class="text-sm font-semibold text-slate-100 mb-3"></div>
 
-    if (error) {
-      console.error(error);
-      return;
+      <div id="suspendReasonsList"
+           class="space-y-2 max-h-64 overflow-y-auto mb-4">
+        <!-- radios se llenan por JS -->
+      </div>
+
+      <div class="space-y-1 mb-4">
+        <label class="text-xs text-slate-400 uppercase tracking-wide">
+          Nota adicional (opcional)
+        </label>
+        <textarea
+          id="suspendExtra"
+          rows="3"
+          class="w-full rounded-xl bg-slate-900/80 border border-slate-700 text-xs p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="Ejemplo: Cliente indicó que no atiende llamadas desde hace más de una semana..."
+        ></textarea>
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-3">
+        <span>La cuenta no podrá iniciar sesión mientras esté suspendida.</span>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button
+          onclick="closeSuspendModal()"
+          class="px-4 py-2 rounded-lg border border-slate-600 text-sm text-slate-200 hover:bg-slate-800">
+          Cancelar
+        </button>
+        <button
+          onclick="confirmSuspend()"
+          class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-sm font-semibold">
+          Suspender cuenta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script type="module">
+    import { supabase } from "../js/supabase.js";
+
+    let cachedUsers = [];
+    let cachedWorkersPending = [];
+    let cachedWorkersVerified = [];
+    let cachedJobs = [];
+    let cachedReviews = [];
+
+    let suspendCurrentUserId = null;
+
+    const SUSPENSION_REASONS = [
+      {
+        id: "address_invalid",
+        title: "Dirección no válida / no localizable",
+        message:
+          "La dirección proporcionada ha sido reportada múltiples veces como no válida o imposible de localizar. " +
+          "Nuestro equipo ha intentado ponerse en contacto con usted en varias ocasiones sin obtener respuesta.",
+      },
+      {
+        id: "id_mismatch",
+        title: "Identificación no coincide",
+        message:
+          "La información de su documento de identidad no coincide con los datos registrados en su cuenta. " +
+          "Hasta que se verifique su identidad, la cuenta permanecerá suspendida por motivos de seguridad.",
+      },
+      {
+        id: "poor_work_quality",
+        title: "Reportes de trabajos mal realizados",
+        message:
+          "Hemos recibido múltiples reportes de trabajos incompletos, mal ejecutados o que no cumplen con los " +
+          "estándares mínimos de calidad establecidos por FIXALL. Es necesario revisar su historial de servicios.",
+      },
+      {
+        id: "behaviour",
+        title: "Comportamiento inapropiado con clientes",
+        message:
+          "Se han recibido reportes de comportamiento inapropiado, lenguaje ofensivo o trato poco profesional " +
+          "hacia los clientes. Este tipo de conducta va en contra de las políticas de FIXALL.",
+      },
+      {
+        id: "missed_appointments",
+        title: "Incumplimiento reiterado de citas",
+        message:
+          "Se han registrado múltiples citas no atendidas o cancelaciones sin aviso previo, afectando la " +
+          "experiencia de los clientes. Es necesario revisar su disponibilidad y cumplimiento.",
+      },
+      {
+        id: "fraud",
+        title: "Actividad sospechosa / posible fraude",
+        message:
+          "Se ha detectado actividad inusual o potencialmente fraudulenta asociada a esta cuenta. " +
+          "Por seguridad, el acceso permanecerá suspendido mientras se realiza una revisión detallada.",
+      },
+      {
+        id: "other",
+        title: "Otro motivo (revisión interna)",
+        message:
+          "La cuenta ha sido suspendida temporalmente mientras nuestro equipo de cumplimiento realiza una revisión adicional.",
+      },
+    ];
+
+    /* ---------------------- HELPERS ---------------------- */
+    function setStats() {
+      document.getElementById("stat-users").innerText = cachedUsers.length;
+      const allWorkers = cachedUsers.filter(u => u.role === "worker");
+      document.getElementById("stat-workers").innerText = allWorkers.length;
+      document.getElementById("stat-pending").innerText = cachedWorkersPending.length;
+      document.getElementById("stat-verified").innerText = cachedWorkersVerified.length;
     }
 
-    table.innerHTML = "";
-
-    data.forEach(u => {
-      table.innerHTML += `
-        <tr class="border-b">
-          <td class="p-3">
-            <img src="${u.profile_image || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded-full object-cover">
-          </td>
-          <td class="p-3 font-bold">${u.full_name}</td>
-          <td class="p-3">${u.email}</td>
-          <td class="p-3">${u.phone || 'N/A'}</td>
-          <td class="p-3">${u.city || 'N/A'}</td>
-          <td class="p-3">${u.role}</td>
-
-          <td class="p-3 space-x-2">
-            <button onclick="suspendUser('${u.id}')" class="bg-yellow-500 px-3 py-1 rounded text-white">Suspend</button>
-            <button onclick="blockUser('${u.id}')" class="bg-orange-600 px-3 py-1 rounded text-white">Block</button>
-            <button onclick="banUser('${u.id}')" class="bg-red-600 px-3 py-1 rounded text-white">Ban</button>
-            <button onclick="deleteUser('${u.id}')" class="bg-gray-700 px-3 py-1 rounded text-white">Delete</button>
-          </td>
-        </tr>`;
-    });
-  }
-
-
-
-
-
-  /* ===========================
-        USER ACTIONS
-  ============================ */
-  window.suspendUser = async (id) => {
-    await supabase.from("users").update({ role: "suspended" }).eq("id", id);
-    loadUsers();
-  };
-
-  window.blockUser = async (id) => {
-    await supabase.from("users").update({ role: "blocked" }).eq("id", id);
-    loadUsers();
-  };
-
-  window.banUser = async (id) => {
-    await supabase.from("users").update({ role: "banned" }).eq("id", id);
-    loadUsers();
-  };
-
-  window.deleteUser = async (id) => {
-    await supabase.from("users").delete().eq("id", id);
-    loadUsers();
-  };
-
-
-
-
-
-  /* ===========================
-        LOAD WORKERS
-  ============================ */
-  async function loadWorkers() {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("role", "worker");
-
-    const table = document.getElementById("workersTable");
-
-    if (error) {
-      console.error(error);
-      return;
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return "";
+      return String(str).replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;");
     }
 
-    table.innerHTML = "";
-
-    data.forEach(w => {
-      table.innerHTML += `
-        <tr class="border-b">
-          <td class="p-3">
-            <img src="${w.profile_image || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded-full object-cover">
-          </td>
-          <td class="p-3 font-bold">${w.full_name}</td>
-          <td class="p-3">${w.email}</td>
-          <td class="p-3">${w.phone || 'N/A'}</td>
-          <td class="p-3">${w.city || 'N/A'}</td>
-          <td class="p-3">${w.experience_years || 0} years</td>
-
-          <td class="p-3 space-x-2">
-            <button onclick="suspendWorker('${w.id}')" class="bg-yellow-500 px-3 py-1 rounded text-white">Suspend</button>
-            <button onclick="blockWorker('${w.id}')" class="bg-orange-600 px-3 py-1 rounded text-white">Block</button>
-            <button onclick="banWorker('${w.id}')" class="bg-red-600 px-3 py-1 rounded text-white">Ban</button>
-            <button onclick="deleteWorker('${w.id}')" class="bg-gray-700 px-3 py-1 rounded text-white">Delete</button>
-          </td>
-        </tr>`;
-    });
-  }
-
-
-  /* ===========================
-        WORKER ACTIONS
-  ============================ */
-  window.suspendWorker = async (id) => {
-    await supabase.from("users").update({ role: "suspended" }).eq("id", id);
-    loadWorkers();
-  };
-
-  window.blockWorker = async (id) => {
-    await supabase.from("users").update({ role: "blocked" }).eq("id", id);
-    loadWorkers();
-  };
-
-  window.banWorker = async (id) => {
-    await supabase.from("users").update({ role: "banned" }).eq("id", id);
-    loadWorkers();
-  };
-
-  window.deleteWorker = async (id) => {
-    await supabase.from("users").delete().eq("id", id);
-    loadWorkers();
-  };
-
-
-
-
-  /* ===========================
-        LOAD JOBS
-  ============================ */
-  async function loadJobs() {
-    const { data, error } = await supabase.from("jobs").select("*");
-
-    const table = document.getElementById("jobsTable");
-
-    if (error) {
-      console.error(error);
-      return;
+    function renderSuspendReasons() {
+      const list = document.getElementById("suspendReasonsList");
+      if (!list) return;
+      list.innerHTML = SUSPENSION_REASONS.map((r, idx) => `
+        <label class="flex items-start gap-2 p-2 rounded-lg bg-slate-900/70 border border-slate-700 cursor-pointer hover:border-indigo-500">
+          <input
+            type="radio"
+            name="suspendReason"
+            value="${r.id}"
+            class="mt-1"
+            ${idx === 0 ? "checked" : ""}
+          />
+          <div>
+            <div class="text-sm font-semibold text-slate-100">${escapeHtml(r.title)}</div>
+            <div class="text-xs text-slate-400">${escapeHtml(r.message)}</div>
+          </div>
+        </label>
+      `).join("");
     }
 
-    table.innerHTML = "";
+    // Abrir perfil de usuario desde jobs (o donde sea)
+    window.openUserProfile = (identifier) => {
+      if (!identifier) return;
+      const user =
+        cachedUsers.find(u => u.id === identifier) ||
+        cachedUsers.find(u => u.email === identifier);
+      if (!user) {
+        alert("User not found in current list.");
+        return;
+      }
+      openDetails(encodeURIComponent(JSON.stringify(user)));
+    };
 
-    data.forEach(j => {
-      table.innerHTML += `
-        <tr class="border-b">
-          <td class="p-3">${j.client_name}</td>
-          <td class="p-3">${j.worker_name || "Not Assigned"}</td>
-          <td class="p-3">${j.status}</td>
-        </tr>`;
-    });
-  }
+    /* ---------------------- LOAD PENDING WORKERS ---------------------- */
+    async function loadPendingWorkers() {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("role", "worker")
+        .eq("verified", false);
 
+      if (error) {
+        console.error(error);
+        return;
+      }
 
+      cachedWorkersPending = data || [];
+      const container = document.getElementById("pendingWorkers");
+      container.innerHTML = "";
 
-  /* ===========================
-        INIT LOAD
-  ============================ */
-  loadUsers();
-  loadWorkers();
-  loadJobs();
-</script>
+      cachedWorkersPending.forEach(w => {
+        const searchText = [
+          w.full_name, w.first_name, w.last_name, w.email,
+          w.phone, w.ssn, w.city, w.state, w.suspended ? "suspendido suspended" : ""
+        ].filter(Boolean).join(" ").toLowerCase();
 
+        container.innerHTML += `
+          <div class="card p-5" data-search="${escapeHtml(searchText)}">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-bold">${escapeHtml(w.full_name)}</h3>
+              <span class="chip bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">
+                Pending
+              </span>
+            </div>
+
+            <p class="text-xs text-slate-400 mb-3">
+              ID: <span class="font-mono">${escapeHtml(w.id)}</span>
+            </p>
+
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-300 mb-4">
+              <p><b>First:</b> ${escapeHtml(w.first_name)}</p>
+              <p><b>Last:</b> ${escapeHtml(w.last_name)}</p>
+              <p><b>Middle:</b> ${escapeHtml(w.middle_name ?? "")}</p>
+              <p><b>Email:</b> ${escapeHtml(w.email)}</p>
+              <p><b>Phone:</b> ${escapeHtml(w.phone)}</p>
+              <p><b>SSN:</b> ${escapeHtml(w.ssn)}</p>
+              <p><b>Role:</b> ${escapeHtml(w.role)}</p>
+              <p><b>Created:</b> ${escapeHtml(w.created_at)}</p>
+              <p><b>City:</b> ${escapeHtml(w.city)}</p>
+              <p><b>State:</b> ${escapeHtml(w.state)}</p>
+              <p><b>ZIP:</b> ${escapeHtml(w.zipcode)}</p>
+              <p><b>Experience:</b> ${escapeHtml(w.experience_years)} years</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mb-3">
+              <img src="${escapeHtml(w.front_image)}"
+                   class="h-32 w-full object-cover rounded-lg border border-slate-700 cursor-pointer"
+                   onclick="viewImage('${escapeHtml(w.front_image)}')" />
+              <img src="${escapeHtml(w.left_image)}"
+                   class="h-32 w-full object-cover rounded-lg border border-slate-700 cursor-pointer"
+                   onclick="viewImage('${escapeHtml(w.left_image)}')" />
+              <img src="${escapeHtml(w.right_image)}"
+                   class="h-32 w-full object-cover rounded-lg border border-slate-700 cursor-pointer"
+                   onclick="viewImage('${escapeHtml(w.right_image)}')" />
+              <img src="${escapeHtml(w.id_image)}"
+                   class="h-32 w-full object-cover rounded-lg border border-slate-700 cursor-pointer"
+                   onclick="viewImage('${escapeHtml(w.id_image)}')" />
+            </div>
+
+            <div class="flex justify-between items-center mt-3">
+              <button
+                onclick="openDetails('${encodeURIComponent(JSON.stringify(w))}')"
+                class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700">
+                View full details
+              </button>
+
+              <div class="flex gap-2">
+                <button
+                  onclick="approveWorker('${w.id}')"
+                  class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold">
+                  Approve
+                </button>
+                <button
+                  onclick="rejectWorker('${w.id}')"
+                  class="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-semibold">
+                  Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      setStats();
+    }
+
+    window.approveWorker = async (id) => {
+      await supabase.from("users").update({ verified: true }).eq("id", id);
+      await loadPendingWorkers();
+      await loadVerifiedWorkers();
+      await loadUsers();
+    };
+
+    window.rejectWorker = async (id) => {
+      await supabase.from("users").delete().eq("id", id);
+      await loadPendingWorkers();
+      await loadVerifiedWorkers();
+      await loadUsers();
+    };
+
+    /* ---------------------- VERIFIED WORKERS ---------------------- */
+    async function loadVerifiedWorkers() {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("role", "worker")
+        .eq("verified", true);
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      cachedWorkersVerified = data || [];
+      const table = document.getElementById("workersTable");
+      table.innerHTML = "";
+
+      cachedWorkersVerified.forEach(w => {
+        const searchText = [
+          w.full_name, w.first_name, w.last_name, w.email,
+          w.phone, w.ssn, w.city, w.state,
+          w.suspended ? "suspendido suspended" : ""
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        const suspendedChip = w.suspended
+          ? '<span class="chip bg-red-500/20 text-red-300 border border-red-400/60">SUSPENDED</span>'
+          : '<span class="chip bg-emerald-500/10 text-emerald-200 border border-emerald-400/30">ACTIVE</span>';
+
+        const verifiedChip = w.verified
+          ? '<span class="chip bg-emerald-500/15 text-emerald-300 border border-emerald-400/40">VERIFIED</span>'
+          : '<span class="chip bg-slate-600/40 text-slate-200 border border-slate-500/60">PENDING</span>';
+
+        const suspendButton = w.suspended
+          ? `<button
+                onclick="unsuspendUser('${w.id}')"
+                class="px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs">
+                Remove Suspension
+             </button>`
+          : `<button
+                onclick="openSuspendModal('${w.id}')"
+                class="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-xs">
+                Suspend
+             </button>`;
+
+        table.innerHTML += `
+          <tr class="border-t border-slate-800" data-search="${escapeHtml(searchText)}">
+            <td class="p-3">
+              <img src="${escapeHtml(w.profile_image || "")}"
+                   class="w-10 h-10 rounded-full object-cover border border-slate-700">
+            </td>
+            <td class="p-3">${escapeHtml(w.full_name)}</td>
+            <td class="p-3">${escapeHtml(w.email)}</td>
+            <td class="p-3">${escapeHtml(w.phone)}</td>
+            <td class="p-3">${escapeHtml(w.city)}</td>
+            <td class="p-3 font-mono text-xs">${escapeHtml(w.ssn)}</td>
+            <td class="p-3">
+              ${verifiedChip}
+            </td>
+            <td class="p-3">
+              ${suspendedChip}
+            </td>
+            <td class="p-3 text-right space-x-2">
+              <button
+                onclick="openDetails('${encodeURIComponent(JSON.stringify(w))}')"
+                class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">
+                Details
+              </button>
+              ${suspendButton}
+            </td>
+          </tr>
+        `;
+      });
+
+      setStats();
+    }
+
+    /* ---------------------- ALL USERS (SPLIT: CLIENTS & WORKERS) ---------------------- */
+    async function loadUsers() {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      cachedUsers = data || [];
+
+      const clientsTable = document.getElementById("clientsTable");
+      const workersTable = document.getElementById("usersTable");
+      clientsTable.innerHTML = "";
+      workersTable.innerHTML = "";
+
+      cachedUsers.forEach(u => {
+        const searchText = [
+          u.full_name, u.first_name, u.last_name, u.email,
+          u.phone, u.city, u.state, u.role,
+          u.suspended ? "suspendido suspended" : ""
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        const verifiedChip = u.verified
+          ? '<span class="chip bg-emerald-500/15 text-emerald-300 border border-emerald-400/40">YES</span>'
+          : '<span class="chip bg-slate-600/40 text-slate-200 border border-slate-500/60">NO</span>';
+
+        const suspendedChip = u.suspended
+          ? '<span class="chip bg-red-500/20 text-red-300 border border-red-400/60">SUSPENDED</span>'
+          : '<span class="chip bg-emerald-500/10 text-emerald-200 border border-emerald-400/30">ACTIVE</span>';
+
+        const suspendButton = u.suspended
+          ? `<button
+                onclick="unsuspendUser('${u.id}')"
+                class="px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs">
+                Remove Suspension
+             </button>`
+          : `<button
+                onclick="openSuspendModal('${u.id}')"
+                class="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-xs">
+                Suspend
+             </button>`;
+
+        const rowHtml = `
+          <tr class="border-t border-slate-800" data-search="${escapeHtml(searchText)}">
+            <td class="p-3">
+              <img src="${escapeHtml(u.profile_image || "")}"
+                   class="w-10 h-10 rounded-full object-cover border border-slate-700">
+            </td>
+            <td class="p-3">${escapeHtml(u.full_name)}</td>
+            <td class="p-3">${escapeHtml(u.email)}</td>
+            <td class="p-3">${escapeHtml(u.role)}</td>
+            <td class="p-3">${escapeHtml(u.city)}</td>
+            <td class="p-3">${escapeHtml(u.phone)}</td>
+            <td class="p-3">
+              ${verifiedChip}
+            </td>
+            <td class="p-3">
+              ${suspendedChip}
+            </td>
+            <td class="p-3 text-xs text-slate-300">${escapeHtml(u.created_at)}</td>
+            <td class="p-3 text-right space-x-2">
+              <button
+                onclick="openDetails('${encodeURIComponent(JSON.stringify(u))}')"
+                class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">
+                Details
+              </button>
+              ${suspendButton}
+              <button
+                onclick="deleteUser('${u.id}')"
+                class="px-3 py-1 rounded-lg bg-red-700/80 hover:bg-red-600 text-xs">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+
+        if (u.role === "client") {
+          clientsTable.innerHTML += rowHtml;
+        } else if (u.role === "worker") {
+          workersTable.innerHTML += rowHtml;
+        }
+      });
+
+      setStats();
+    }
+
+    window.deleteUser = async (id) => {
+      await supabase.from("users").delete().eq("id", id);
+      await loadUsers();
+      await loadPendingWorkers();
+      await loadVerifiedWorkers();
+    };
+
+    /* ---------------------- JOBS ---------------------- */
+    async function loadJobs() {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      cachedJobs = data || [];
+
+      const tableAvailable = document.getElementById("jobsAvailableTable");
+      const tableInProgress = document.getElementById("jobsInProgressTable");
+      const tableCompleted = document.getElementById("jobsCompletedTable");
+      const tableFuture = document.getElementById("jobsFutureTable");
+
+      if (!tableAvailable || !tableInProgress || !tableCompleted || !tableFuture) {
+        return;
+      }
+
+      tableAvailable.innerHTML = "";
+      tableInProgress.innerHTML = "";
+      tableCompleted.innerHTML = "";
+      tableFuture.innerHTML = "";
+
+      cachedJobs.forEach(job => {
+        const workerUser =
+          (job.worker_id && cachedUsers.find(u => u.id === job.worker_id)) ||
+          (job.worker_email && cachedUsers.find(u => u.email === job.worker_email));
+        const clientUser =
+          (job.client_id && cachedUsers.find(u => u.id === job.client_id)) ||
+          (job.client_email && cachedUsers.find(u => u.email === job.client_email));
+
+        const workerPhoto = workerUser?.profile_image || "";
+        const clientPhoto = clientUser?.profile_image || "";
+
+        const workerDisplayName = workerUser?.full_name || job.worker_name || "Unassigned";
+        const clientDisplayName = clientUser?.full_name || job.client_name || "—";
+
+        const workerIdentifier = workerUser?.id || job.worker_id || job.worker_email || "";
+        const clientIdentifier = clientUser?.id || job.client_id || job.client_email || "";
+
+        const searchText = [
+          job.id,
+          job.title,
+          job.description,
+          job.status,
+          job.price,
+          job.client_name,
+          job.client_email,
+          job.client_phone,
+          job.client_city,
+          job.client_id,
+          job.worker_name,
+          job.worker_email,
+          job.worker_phone,
+          job.worker_city,
+          job.worker_id
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        let statusChip = "";
+        const status = (job.status || "").toLowerCase();
+        if (["in_progress", "working"].includes(status)) {
+          statusChip = '<span class="chip bg-sky-500/20 text-sky-300 border border-sky-500/40">IN PROGRESS</span>';
+        } else if (["completed", "done"].includes(status)) {
+          statusChip = '<span class="chip bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">COMPLETED</span>';
+        } else if (["scheduled", "future", "upcoming"].includes(status)) {
+          statusChip = '<span class="chip bg-purple-500/20 text-purple-300 border border-purple-500/40">SCHEDULED</span>';
+        } else {
+          statusChip = '<span class="chip bg-slate-600/40 text-slate-200 border border-slate-500/60">AVAILABLE</span>';
+        }
+
+        const dateText =
+          job.date_scheduled ||
+          job.started_at ||
+          job.completed_at ||
+          job.created_at ||
+          "";
+
+        const workerQuickSuspend = workerUser
+          ? `<button
+                onclick="openSuspendModal('${workerUser.id}')"
+                class="px-2 py-0.5 rounded-lg bg-red-700/80 hover:bg-red-600 text-[11px]">
+                Suspend W
+             </button>`
+          : "";
+
+        const clientQuickSuspend = clientUser
+          ? `<button
+                onclick="openSuspendModal('${clientUser.id}')"
+                class="px-2 py-0.5 rounded-lg bg-red-700/80 hover:bg-red-600 text-[11px]">
+                Suspend C
+             </button>`
+          : "";
+
+        const workerQuickProfile = workerIdentifier
+          ? `<button
+                onclick="openUserProfile('${workerIdentifier}')"
+                class="px-2 py-0.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-[11px]">
+                Worker
+             </button>`
+          : "";
+
+        const clientQuickProfile = clientIdentifier
+          ? `<button
+                onclick="openUserProfile('${clientIdentifier}')"
+                class="px-2 py-0.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-[11px]">
+                Client
+             </button>`
+          : "";
+
+        const rowHtml = `
+          <tr class="border-t border-slate-800" data-search="${escapeHtml(searchText)}">
+            <td class="p-3">${escapeHtml(job.title || "")}</td>
+
+            <!-- CLIENT -->
+            <td class="p-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-700 bg-slate-900 flex items-center justify-center text-[11px]">
+                  ${
+                    clientPhoto
+                      ? `<img src="${escapeHtml(clientPhoto)}" class="w-full h-full object-cover" />`
+                      : `<span>${escapeHtml((clientDisplayName || "?").charAt(0).toUpperCase())}</span>`
+                  }
+                </div>
+                <div>
+                  ${
+                    clientIdentifier
+                      ? `<button
+                           class="text-xs font-semibold hover:underline"
+                           onclick="openUserProfile('${clientIdentifier}')">
+                           ${escapeHtml(clientDisplayName)}
+                         </button>`
+                      : `<div class="text-xs font-semibold">${escapeHtml(clientDisplayName)}</div>`
+                  }
+                  <div class="text-[11px] text-slate-400">${escapeHtml(job.client_city || "")}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- WORKER -->
+            <td class="p-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-700 bg-slate-900 flex items-center justify-center text-[11px]">
+                  ${
+                    workerPhoto
+                      ? `<img src="${escapeHtml(workerPhoto)}" class="w-full h-full object-cover" />`
+                      : `<span>${escapeHtml((workerDisplayName || "?").charAt(0).toUpperCase())}</span>`
+                  }
+                </div>
+                <div>
+                  ${
+                    workerIdentifier
+                      ? `<button
+                           class="text-xs font-semibold hover:underline"
+                           onclick="openUserProfile('${workerIdentifier}')">
+                           ${escapeHtml(workerDisplayName)}
+                         </button>`
+                      : `<div class="text-xs font-semibold">${escapeHtml(workerDisplayName)}</div>`
+                  }
+                  <div class="text-[11px] text-slate-400">${escapeHtml(job.worker_city || "")}</div>
+                </div>
+              </div>
+            </td>
+
+            <td class="p-3">
+              ${job.price != null ? `$${escapeHtml(job.price)}` : "—"}
+            </td>
+            <td class="p-3 text-xs text-slate-300">${escapeHtml(dateText)}</td>
+            <td class="p-3">
+              ${statusChip}
+            </td>
+            <td class="p-3 text-right space-y-1">
+              <div class="space-x-1">
+                <button
+                  onclick="openDetails('${encodeURIComponent(JSON.stringify(job))}')"
+                  class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">
+                  Job
+                </button>
+                ${workerQuickProfile}
+                ${clientQuickProfile}
+              </div>
+              <div class="space-x-1">
+                ${workerQuickSuspend}
+                ${clientQuickSuspend}
+              </div>
+            </td>
+          </tr>
+        `;
+
+        if (["in_progress", "working"].includes(status)) {
+          tableInProgress.innerHTML += rowHtml;
+        } else if (["completed", "done"].includes(status)) {
+          tableCompleted.innerHTML += rowHtml;
+        } else if (["scheduled", "future", "upcoming"].includes(status)) {
+          tableFuture.innerHTML += rowHtml;
+        } else {
+          tableAvailable.innerHTML += rowHtml;
+        }
+      });
+    }
+
+    /* ---------------------- REVIEWS ---------------------- */
+    async function loadReviews() {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      cachedReviews = data || [];
+      const table = document.getElementById("reviewsTable");
+      if (!table) return;
+
+      table.innerHTML = "";
+
+      cachedReviews.forEach(r => {
+        const searchText = [
+          r.worker_name,
+          r.worker_id,
+          r.client_name,
+          r.client_email,
+          r.comment,
+          r.rating,
+          r.job_id
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        const rating = Number(r.rating || 0);
+        const safeRating = Math.max(0, Math.min(5, rating));
+        const stars =
+          "★".repeat(safeRating) + "☆".repeat(5 - safeRating);
+
+        table.innerHTML += `
+          <tr class="border-t border-slate-800" data-search="${escapeHtml(searchText)}">
+            <td class="p-3">
+              <div class="text-xs font-semibold">${escapeHtml(r.worker_name || "—")}</div>
+              <div class="text-[11px] text-slate-400">ID: ${escapeHtml(r.worker_id || "")}</div>
+            </td>
+            <td class="p-3">
+              <div class="text-xs font-semibold">${escapeHtml(r.client_name || "—")}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(r.client_email || "")}</div>
+            </td>
+            <td class="p-3 text-xs">
+              <div>${escapeHtml(String(r.rating ?? ""))} / 5</div>
+              <div class="font-mono text-[11px]">${stars}</div>
+            </td>
+            <td class="p-3 text-xs text-slate-200 max-w-xs">
+              ${escapeHtml(r.comment || "")}
+            </td>
+            <td class="p-3 text-xs text-slate-300">
+              ${escapeHtml(r.created_at || "")}
+            </td>
+            <td class="p-3 text-right">
+              <button
+                onclick="openDetails('${encodeURIComponent(JSON.stringify(r))}')"
+                class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">
+                Details
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    /* ---------------------- SUSPENDER / DESUSPENDER ---------------------- */
+
+    window.openSuspendModal = (id) => {
+      suspendCurrentUserId = id;
+
+      const user =
+        cachedUsers.find(u => u.id === id) ||
+        cachedWorkersPending.find(u => u.id === id) ||
+        cachedWorkersVerified.find(u => u.id === id);
+
+      const label = user
+        ? (user.full_name || user.email || user.id)
+        : id;
+
+      const nameEl = document.getElementById("suspendUserName");
+      nameEl.textContent = `Cuenta: ${label}`;
+
+      document.getElementById("suspendExtra").value = "";
+
+      const modal = document.getElementById("suspendModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+
+    window.closeSuspendModal = () => {
+      suspendCurrentUserId = null;
+      const modal = document.getElementById("suspendModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    window.confirmSuspend = async () => {
+      if (!suspendCurrentUserId) return;
+
+      const selected = document.querySelector('input[name="suspendReason"]:checked');
+      if (!selected) {
+        alert("Selecciona un motivo de suspensión.");
+        return;
+      }
+
+      const reasonId = selected.value;
+      const reason = SUSPENSION_REASONS.find(r => r.id === reasonId);
+      let message = "";
+
+      if (reason) {
+        message = `${reason.title}\n\n${reason.message}`;
+      }
+
+      const extra = document.getElementById("suspendExtra").value.trim();
+      if (extra) {
+        message += `\n\nNota adicional del equipo de soporte:\n${extra}`;
+      }
+
+      await supabase
+        .from("users")
+        .update({
+          suspended: true,
+          suspension_message: message,
+        })
+        .eq("id", suspendCurrentUserId);
+
+      closeSuspendModal();
+      await loadUsers();
+      await loadPendingWorkers();
+      await loadVerifiedWorkers();
+    };
+
+    window.unsuspendUser = async (id) => {
+      await supabase
+        .from("users")
+        .update({
+          suspended: false,
+          suspension_message: null,
+        })
+        .eq("id", id);
+
+      await loadUsers();
+      await loadPendingWorkers();
+      await loadVerifiedWorkers();
+    };
+
+    /* ---------------------- BUSCADOR GLOBAL ---------------------- */
+    window.searchGlobal = () => {
+      const term = document.getElementById("searchInput").value.toLowerCase().trim();
+      document.querySelectorAll("[data-search]").forEach(el => {
+        const text = el.getAttribute("data-search") || "";
+        el.style.display = text.includes(term) ? "" : "none";
+      });
+    };
+
+    /* ---------------------- MODAL DETALLES ---------------------- */
+    window.openDetails = (encoded) => {
+      const data = JSON.parse(decodeURIComponent(encoded));
+      const modal = document.getElementById("detailsModal");
+      const titleEl = document.getElementById("detailsTitle");
+      const bodyEl = document.getElementById("detailsBody");
+
+      const titleText =
+        data.full_name ||
+        data.title ||
+        data.worker_name ||
+        data.email ||
+        "Details";
+
+      titleEl.textContent = titleText;
+
+      let html = "";
+
+      // IMAGEN PRINCIPAL (avatar / foto)
+      const avatarUrl =
+        data.profile_image ||
+        data.front_image ||
+        data.left_image ||
+        data.right_image ||
+        data.id_image;
+
+      if (avatarUrl) {
+        html += `
+          <div class="flex items-center gap-4 mb-4">
+            <img src="${escapeHtml(avatarUrl)}"
+                 class="w-16 h-16 rounded-full object-cover border border-slate-700">
+            <div>
+              <div class="text-lg font-semibold">${escapeHtml(titleText)}</div>
+              <div class="text-xs text-slate-400">${escapeHtml(data.role || data.status || "")}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="grid md:grid-cols-2 gap-4 text-sm">
+      `;
+
+      // NO mostramos las claves de imagen para evitar URLs larguísimas
+      const imageKeys = new Set([
+        "profile_image",
+        "front_image",
+        "left_image",
+        "right_image",
+        "id_image",
+      ]);
+
+      const fieldsOrder = [
+        // USERS
+        "id","full_name","first_name","middle_name","last_name",
+        "email","password","phone","ssn",
+        "street","city","state","zipcode",
+        "role","verified","suspended","suspension_message",
+        "experience_years","about",
+
+        // JOBS
+        "title","description","status","price",
+        "client_id","client_name","client_email","client_phone","client_city",
+        "worker_id","worker_name","worker_email","worker_phone","worker_city",
+        "date_scheduled","started_at","completed_at","job_id",
+
+        // REVIEWS
+        "rating","comment","worker_id",
+
+        // GENERALES (sin las imágenes)
+        "created_at"
+      ];
+
+      fieldsOrder.forEach(key => {
+        if (!(key in data)) return;
+        if (imageKeys.has(key)) return; // 👈 no mostramos URLs de imagen
+
+        const val = data[key];
+        html += `
+          <div>
+            <div class="text-[11px] uppercase tracking-wide text-slate-400">${key}</div>
+            <div class="text-slate-100 break-all text-xs">
+              ${
+                val === null || val === undefined || val === ""
+                  ? "<span class='text-slate-500'>—</span>"
+                  : escapeHtml(val)
+              }
+            </div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+
+      // GALERÍA DE FOTOS
+      const images = ["front_image","left_image","right_image","id_image"];
+      const existingImgs = images.filter(k => data[k]);
+
+      if (existingImgs.length > 0) {
+        html += `
+          <div class="mt-6">
+            <div class="text-[11px] uppercase tracking-wide text-slate-400 mb-2">
+              Photos
+            </div>
+            <div class="grid md:grid-cols-2 gap-3">
+        `;
+
+        existingImgs.forEach(k => {
+          html += `
+            <div class="space-y-1">
+              <div class="text-xs text-slate-400">${k}</div>
+              <img src="${escapeHtml(data[k])}"
+                   class="rounded-lg border border-slate-700 max-h-64 w-full object-contain bg-black/40" />
+            </div>
+          `;
+        });
+
+        html += `</div></div>`;
+      }
+
+      bodyEl.innerHTML = html;
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+
+    window.closeDetails = () => {
+      const modal = document.getElementById("detailsModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    window.viewImage = (url) => {
+      const data = { full_name: "Photo preview", front_image: url };
+      openDetails(encodeURIComponent(JSON.stringify(data)));
+    };
+
+    /* ---------------------- TABS ---------------------- */
+    window.showTab = (name) => {
+      const tabs = ["pending","verified","clients","users","jobs","reviews"];
+      tabs.forEach(t => {
+        const section = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (section) section.classList.add("hidden");
+        if (btn) btn.classList.remove("tab-active");
+      });
+      const activeSection = document.getElementById(`tab-${name}`);
+      const activeBtn = document.getElementById(`tab-btn-${name}`);
+      if (activeSection) activeSection.classList.remove("hidden");
+      if (activeBtn) activeBtn.classList.add("tab-active");
+    };
+
+    // Default tab
+    showTab("pending");
+
+    /* ---------------------- INIT ---------------------- */
+    (async () => {
+      renderSuspendReasons();
+      await loadUsers();
+      await loadPendingWorkers();
+      await loadVerifiedWorkers();
+      await loadJobs();
+      await loadReviews();
+    })();
+  </script>
 </body>
 </html>
